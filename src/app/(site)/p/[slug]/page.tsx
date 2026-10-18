@@ -238,18 +238,20 @@ export default async function ItemPage({ params }: Params) {
                   <span className="size-[7px] rounded-full bg-[#febc2e]" />
                   <span className="size-[7px] rounded-full bg-[#28c840]" />
                   <span className="ml-2 font-mono text-[11.5px] text-muted">README.md</span>
+                  <span className="hidden items-center gap-1.5 text-[11px] text-muted/80 sm:inline-flex">
+                    <span className="text-muted/40">·</span>
+                    内容较长，可在框内滚动
+                  </span>
                   {item.repoUrl ? (
                     <a
                       href={item.repoUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="ml-auto inline-flex items-center gap-1 text-[11.5px] text-accent transition hover:opacity-75"
+                      className="ml-auto inline-flex items-center gap-1 text-[11.5px] text-muted transition hover:text-ink"
                     >
                       在 GitHub 打开 <ArrowUpRight size={12} />
                     </a>
-                  ) : (
-                    <span className="ml-auto text-[11px] text-muted">可在框内滚动</span>
-                  )}
+                  ) : null}
                 </div>
                 <div className="relative">
                   <div className="readme-scroll h-[440px] overflow-y-auto overscroll-contain px-5 py-4 md:h-[560px] md:px-6">
