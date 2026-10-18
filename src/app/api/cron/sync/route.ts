@@ -89,6 +89,7 @@ async function runRefresh(payload: any, limit: number) {
           lastCommitAt: info.lastCommitAt || undefined,
           latestRelease: info.latestRelease || item.latestRelease || undefined,
           archived: info.archived,
+          readme: info.readme ? info.readme.slice(0, 80000) : item.readme || undefined,
           lastSyncedAt: new Date().toISOString(),
         },
       })
@@ -251,6 +252,41 @@ async function runDiscover(payload: any, perRule = 8) {
   return stats
 }
 
+
+async function runReadme(payload: any, limit: number) {
+  const stats = { filled: 0, failed: 0 }
+
+  const docs = await payload.find({
+    collection: 'items',
+    where: { readme: { exists: false } },
+    limit,
+    depth: 0,
+  })
+
+  for (const item of docs.docs) {
+    if (!item.repoUrl) continue
+    try {
+      const info = await fetchRepoInfo(item.repoUrl)
+      await payload.update({
+        collection: 'items',
+        id: item.id,
+        overrideAccess: true,
+        context: { skipGithub: true },
+        data: {
+          readme: info.readme ? info.readme.slice(0, 80000) : '',
+          lastSyncedAt: new Date().toISOString(),
+        },
+      })
+      stats.filled += 1
+    } catch (error) {
+      stats.failed += 1
+      console.error('[cron:readme] failed', item.slug, String(error))
+    }
+  }
+
+  return stats
+}
+
 export async function GET(request: NextRequest) {
   if (!authorized(request)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
@@ -263,7 +299,14 @@ export async function GET(request: NextRequest) {
     collection: 'sync-runs',
     overrideAccess: true,
     data: {
-      type: task === 'discover' ? 'discover' : task === 'enrich' ? 'enrich' : 'refresh',
+      type:
+        task === 'discover'
+          ? 'discover'
+          : task === 'enrich'
+            ? 'enrich'
+            : task === 'readme'
+              ? 'readme'
+              : 'refresh',
       status: 'running',
       trigger: 'cron',
       startedAt: new Date().toISOString(),
@@ -277,6 +320,7 @@ export async function GET(request: NextRequest) {
     let stats: Record<string, number> = {}
     if (task === 'discover') stats = await runDiscover(payload)
     else if (task === 'enrich') stats = await runEnrich(payload, 6)
+    else if (task === 'readme') stats = await runReadme(payload, 20)
     else stats = await runRefresh(payload, refreshLimit)
 
     await payload.update({

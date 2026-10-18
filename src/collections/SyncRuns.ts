@@ -25,6 +25,7 @@ export const SyncRuns: CollectionConfig = {
         { label: '刷新星标', value: 'refresh' },
         { label: '自动发现', value: 'discover' },
         { label: 'AI 补全', value: 'enrich' },
+        { label: 'README 补全', value: 'readme' },
         { label: '单条导入', value: 'import' },
         { label: '初始化', value: 'seed' },
       ],

@@ -108,6 +108,7 @@ export const Items: CollectionConfig = {
           data.latestRelease = info.latestRelease || current.latestRelease
           data.iconUrl = current.iconUrl || info.avatarUrl
           data.coverUrl = current.coverUrl || info.coverUrl
+          data.readme = info.readme ? info.readme.slice(0, 80000) : current.readme || undefined
           data.summary = current.summary || enrich.summary
           data.tagline = current.tagline || enrich.tagline
           data.installCommand = current.installCommand || enrich.installHint
@@ -300,6 +301,16 @@ export const Items: CollectionConfig = {
             },
             { name: 'body', label: '正文', type: 'richText' },
             { name: 'audience', label: '适合人群', type: 'text' },
+            {
+              name: 'readme',
+              label: 'README（自动抓取）',
+              type: 'textarea',
+              maxLength: 120000,
+              admin: {
+                readOnly: true,
+                description: '详情页的 README 阅读区内容，导入或刷新时自动抓取',
+              },
+            },
           ],
         },
         {
