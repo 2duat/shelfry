@@ -251,6 +251,18 @@ export const Items: CollectionConfig = {
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
     },
     {
+      name: 'aiEnriched',
+      label: 'AI 已补全',
+      type: 'checkbox',
+      defaultValue: false,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: '由 AI 补全任务自动标记，无需手动修改',
+      },
+    },
+    {
       name: 'syncNow',
       label: '重新抓取 GitHub',
       type: 'checkbox',
@@ -496,14 +508,6 @@ export const Items: CollectionConfig = {
                   ],
                 },
                 { name: 'aiMeta', label: 'AI 元信息', type: 'json', admin: { readOnly: true } },
-                {
-                  name: 'aiEnriched',
-                  label: 'AI 已补全',
-                  type: 'checkbox',
-                  defaultValue: false,
-                  index: true,
-                  admin: { readOnly: true },
-                },
               ],
             },
             {
