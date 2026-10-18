@@ -12,9 +12,14 @@ export function NavHeader() {
           <span className="os-nav-head__sub">OpenShelf</span>
         </span>
       </div>
-      <a className="os-nav-head__link" href="/" target="_blank" rel="noreferrer">
-        查看前台 ↗
-      </a>
+      <div className="os-nav-head__actions">
+        <a className="os-nav-head__add" href="/admin/collections/items">
+          ＋ 添加项目
+        </a>
+        <a className="os-nav-head__link" href="/" target="_blank" rel="noreferrer">
+          查看前台 ↗
+        </a>
+      </div>
     </div>
   )
 }
