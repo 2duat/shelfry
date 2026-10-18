@@ -113,7 +113,7 @@ export default async function ItemPage({ params }: Params) {
           <TrafficLights />
           <div className="mx-auto flex items-center gap-1.5 rounded-[7px] border border-line bg-surface px-2.5 py-1 text-[11px] text-muted">
             <Lock size={10} />
-            <span className="max-w-[240px] truncate">openshelf.app/p/{item.slug}</span>
+            <span className="max-w-[240px] truncate">shelfry.app/p/{item.slug}</span>
           </div>
           <div className="w-10" />
         </div>

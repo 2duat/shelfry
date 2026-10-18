@@ -4,7 +4,7 @@ import { Search } from 'lucide-react'
 
 export function SearchButton({ compact = false }: { compact?: boolean }) {
   function open() {
-    window.dispatchEvent(new CustomEvent('openshelf:search'))
+    window.dispatchEvent(new CustomEvent('shelfry:search'))
   }
 
   if (compact) {

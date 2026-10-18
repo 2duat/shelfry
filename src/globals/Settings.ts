@@ -17,7 +17,7 @@ export const Settings: GlobalConfig = {
         {
           label: '站点信息',
           fields: [
-            { name: 'siteName', label: '站点名称', type: 'text', defaultValue: 'OpenShelf' },
+            { name: 'siteName', label: '站点名称', type: 'text', defaultValue: 'Shelfry' },
             { name: 'tagline', label: '副标题', type: 'text', defaultValue: '精选开源软件与 AI 工具' },
             { name: 'description', label: '站点描述', type: 'textarea' },
             { name: 'heroTitle', label: '首页大标题', type: 'text', defaultValue: '发现真正好用的开源软件' },

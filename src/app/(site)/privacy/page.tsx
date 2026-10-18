@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: '隐私说明',
-  description: 'OpenShelf 收集哪些数据、如何使用。',
+  description: 'Shelfry 收集哪些数据、如何使用。',
   alternates: { canonical: '/privacy' },
 }
 

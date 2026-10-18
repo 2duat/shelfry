@@ -29,7 +29,7 @@ function authorized(request: NextRequest): boolean {
 function ghHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
-    'User-Agent': 'OpenShelf/1.0',
+    'User-Agent': 'Shelfry/1.0',
     'X-GitHub-Api-Version': '2022-11-28',
   }
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`

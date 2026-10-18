@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: '搜索',
-  description: '在 OpenShelf 中搜索开源软件、AI 工具与插件。',
+  description: '在 Shelfry 中搜索开源软件、AI 工具与插件。',
   robots: { index: false },
 }
 

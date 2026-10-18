@@ -26,7 +26,7 @@ export function Logo() {
       >
         O
       </span>
-      <span style={{ fontSize: 20, fontWeight: 650, letterSpacing: '-0.02em' }}>OpenShelf</span>
+      <span style={{ fontSize: 20, fontWeight: 650, letterSpacing: '-0.02em' }}>Shelfry</span>
     </div>
   )
 }

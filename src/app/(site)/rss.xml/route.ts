@@ -34,7 +34,7 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>OpenShelf · 精选开源软件与 AI 工具</title>
+    <title>Shelfry · 精选开源软件与 AI 工具</title>
     <link>${base}</link>
     <description>人工策展 + GitHub 自动同步的开源软件目录</description>
     <language>zh-CN</language>

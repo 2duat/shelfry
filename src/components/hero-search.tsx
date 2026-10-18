@@ -6,7 +6,7 @@ export function HeroSearch() {
   return (
     <button
       type="button"
-      onClick={() => window.dispatchEvent(new CustomEvent('openshelf:search'))}
+      onClick={() => window.dispatchEvent(new CustomEvent('shelfry:search'))}
       className="group flex h-[52px] w-full items-center gap-3 rounded-[14px] border border-line bg-surface/80 pl-4 pr-2.5 text-left shadow-card backdrop-blur-xl transition hover:border-line-strong"
     >
       <Search size={18} className="text-muted" />

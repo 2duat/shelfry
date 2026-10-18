@@ -31,11 +31,11 @@ export function SiteHeader({ githubUrl }: { githubUrl?: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line glass">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5 md:px-8">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="OpenShelf 首页">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Shelfry 首页">
           <span className="grid size-8 place-items-center rounded-[9px] bg-gradient-to-br from-[#3b82f6] to-[#6366f1] text-white shadow-sm">
             <Layers3 size={17} strokeWidth={2.2} />
           </span>
-          <span className="text-[15px] font-semibold tracking-[-0.01em]">OpenShelf</span>
+          <span className="text-[15px] font-semibold tracking-[-0.01em]">Shelfry</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

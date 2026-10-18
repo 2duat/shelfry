@@ -1,4 +1,4 @@
-# OpenShelf
+# Shelfry
 
 一个 macOS 风格的开源软件 / AI 工具目录站。人工策展 + GitHub 自动同步，后台粘贴一个仓库地址就能自动补全信息。
 
@@ -74,7 +74,7 @@ cp .env.example .env
 # 修改 DATABASE_URI 指向你的 PostgreSQL，并填 PAYLOAD_SECRET
 
 # 3. 建库（示例）
-createdb openshelf
+createdb shelfry
 
 # 4. 启动（首次启动 Payload 会自动建表）
 npm run dev
@@ -88,7 +88,7 @@ npm run seed
 - 前台 <http://localhost:3000>
 - 后台 <http://localhost:3000/admin>
 
-`npm run seed` 会创建管理员 `admin@openshelf.local` / `admin123456`，**上线前务必改密码**。
+`npm run seed` 会创建管理员 `admin@shelfry.app` / `admin123456`，**上线前务必改密码**。
 
 ---
 
@@ -96,7 +96,7 @@ npm run seed
 
 | 变量 | 必填 | 说明 |
 |---|---|---|
-| `DATABASE_URI` | ✅ | `postgres://user:pass@127.0.0.1:5432/openshelf` |
+| `DATABASE_URI` | ✅ | `postgres://user:pass@127.0.0.1:5432/shelfry` |
 | `PAYLOAD_SECRET` | ✅ | `openssl rand -hex 32` |
 | `NEXT_PUBLIC_SITE_URL` | ✅ | 站点地址，用于 SEO / sitemap |
 | `CRON_SECRET` | ✅ | 定时任务调用凭证 |

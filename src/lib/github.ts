@@ -25,7 +25,7 @@ export type RepoInfo = {
 function headers(): Record<string, string> {
   const h: Record<string, string> = {
     Accept: 'application/vnd.github+json',
-    'User-Agent': 'OpenShelf/1.0',
+    'User-Agent': 'Shelfry/1.0',
     'X-GitHub-Api-Version': '2022-11-28',
   }
   if (process.env.GITHUB_TOKEN) {
@@ -49,7 +49,7 @@ async function fetchReadme(owner: string, repo: string): Promise<string> {
   for (const file of candidates) {
     try {
       const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/HEAD/${file}`, {
-        headers: { 'User-Agent': 'OpenShelf/1.0' },
+        headers: { 'User-Agent': 'Shelfry/1.0' },
         cache: 'no-store',
       })
       if (res.ok) {

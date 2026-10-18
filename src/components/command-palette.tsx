@@ -54,10 +54,10 @@ export function CommandPalette() {
       setOpen(true)
     }
     window.addEventListener('keydown', onKeyDown)
-    window.addEventListener('openshelf:search', onOpen)
+    window.addEventListener('shelfry:search', onOpen)
     return () => {
       window.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('openshelf:search', onOpen)
+      window.removeEventListener('shelfry:search', onOpen)
     }
   }, [])
 

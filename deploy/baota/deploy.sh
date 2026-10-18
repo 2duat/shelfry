@@ -22,7 +22,7 @@ npm run build
 
 echo "==> 重启服务"
 if command -v pm2 >/dev/null 2>&1; then
-  pm2 reload openshelf || pm2 start deploy/baota/ecosystem.config.cjs
+  pm2 reload shelfry || pm2 start deploy/baota/ecosystem.config.cjs
 fi
 
 echo "==> 完成，用时约 2-3 分钟"

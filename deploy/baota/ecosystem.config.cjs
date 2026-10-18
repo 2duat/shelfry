@@ -5,7 +5,7 @@ const path = require('path')
 module.exports = {
   apps: [
     {
-      name: 'openshelf',
+      name: 'shelfry',
       cwd: path.resolve(__dirname, '../..'),
       script: 'node_modules/next/dist/bin/next',
       args: 'start -H 127.0.0.1 -p 3000',

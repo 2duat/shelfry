@@ -27,7 +27,7 @@
 
 宝塔 → 网站 → 添加站点：
 
-- 域名：`os.example.com`
+- 域名：`shelfry.app`
 - PHP 版本：**纯静态**
 - 数据库：不勾选（下一步单独建 PG）
 
@@ -39,8 +39,8 @@
 
 宝塔 → 数据库 → PostgreSQL → 添加数据库：
 
-- 数据库名：`openshelf`
-- 用户名：`openshelf`
+- 数据库名：`shelfry`
+- 用户名：`shelfry`
 - 密码：生成一个强密码，记下来
 - 访问权限：**本地服务器**
 
@@ -52,27 +52,27 @@
 
 ```bash
 cd /www/wwwroot
-git clone <你的仓库地址> openshelf
-cd openshelf
+git clone <你的仓库地址> shelfry
+cd shelfry
 ```
 
-也可以本地打包 zip 上传后在宝塔文件管理器解压到 `/www/wwwroot/openshelf`。
+也可以本地打包 zip 上传后在宝塔文件管理器解压到 `/www/wwwroot/shelfry`。
 
 ---
 
 ## 4. 配置环境变量
 
 ```bash
-cd /www/wwwroot/openshelf
+cd /www/wwwroot/shelfry
 cp .env.example .env
 ```
 
 编辑 `.env`：
 
 ```env
-DATABASE_URI=postgres://openshelf:你的密码@127.0.0.1:5432/openshelf
+DATABASE_URI=postgres://shelfry:你的密码@127.0.0.1:5432/shelfry
 PAYLOAD_SECRET=用 openssl rand -hex 32 生成
-NEXT_PUBLIC_SITE_URL=https://os.example.com
+NEXT_PUBLIC_SITE_URL=https://shelfry.app
 CRON_SECRET=用 openssl rand -hex 24 生成
 SEED_SECRET=用 openssl rand -hex 24 生成
 
@@ -97,7 +97,7 @@ openssl rand -hex 24   # CRON_SECRET / SEED_SECRET
 ## 5. 安装、建表、构建
 
 ```bash
-cd /www/wwwroot/openshelf
+cd /www/wwwroot/shelfry
 bash deploy/baota/install.sh
 ```
 
@@ -125,7 +125,7 @@ mkdir -p uploads logs
 
 | 项 | 填写 |
 |---|---|
-| 项目目录 | `/www/wwwroot/openshelf` |
+| 项目目录 | `/www/wwwroot/shelfry` |
 | 启动命令 | `npm run start` |
 | 项目端口 | `3000` |
 | Node 版本 | `22` |
@@ -142,7 +142,7 @@ mkdir -p uploads logs
 
 站点设置 → 反向代理 → 添加：
 
-- 代理名称：`openshelf`
+- 代理名称：`shelfry`
 - 目标 URL：`http://127.0.0.1:3000`
 - 发送域名：`$host`
 
@@ -156,13 +156,13 @@ mkdir -p uploads logs
 ## 8. 初始化数据
 
 ```bash
-cd /www/wwwroot/openshelf
+cd /www/wwwroot/shelfry
 npm run seed
 ```
 
 会创建：
 
-- 管理员：`admin@openshelf.local` / `admin123456`（**登录后立刻改密码**）
+- 管理员：`admin@shelfry.local` / `admin123456`（**登录后立刻改密码**）
 - 10 个分类、7 个标签
 - 15 个真实开源项目（自动抓取 GitHub 数据）
 - 3 个编辑合集
@@ -194,8 +194,8 @@ npm run seed
 
 宝塔 → 计划任务 → 添加「备份数据库」+「备份目录」：
 
-- 数据库：选 `openshelf`，每天 03:10
-- 目录：`/www/wwwroot/openshelf/uploads` 和 `.env`，每天 03:20
+- 数据库：选 `shelfry`，每天 03:10
+- 目录：`/www/wwwroot/shelfry/uploads` 和 `.env`，每天 03:20
 - 存储：在宝塔「云存储」里挂阿里云 OSS / 腾讯云 COS，备份自动上传
 
 恢复：宝塔备份列表点「恢复」，再解压 uploads 即可。
@@ -212,14 +212,14 @@ npm run seed
 | 重启服务 | 宝塔 Node 项目 → 重启 |
 | 更新代码 | `bash deploy/baota/deploy.sh` |
 | 看日志 | `logs/dev.log`（开发）、`logs/pm2-*.log`、宝塔 Node 项目日志 |
-| 健康检查 | `https://os.example.com/api/health` |
+| 健康检查 | `https://shelfry.app/api/health` |
 
 ---
 
 ## 常见问题
 
 **502 Bad Gateway**
-Node 进程没起来。看宝塔 Node 项目日志 / `pm2 logs openshelf`，多半是 `.env` 里数据库连不上。
+Node 进程没起来。看宝塔 Node 项目日志 / `pm2 logs shelfry`，多半是 `.env` 里数据库连不上。
 
 **安装依赖时报 sharp 相关错误**
 不要在 Mac 上 `npm ci` 再上传 `node_modules`。必须在服务器上执行 `npm ci`。

@@ -35,7 +35,7 @@ export default buildConfig({
       },
     },
     meta: {
-      titleSuffix: ' · OpenShelf',
+      titleSuffix: ' · Shelfry',
     },
   },
   collections: [Items, Categories, Tags, CuratedLists, Submissions, SyncRuns, Media, Users],

@@ -3,16 +3,16 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: '关于',
-  description: 'OpenShelf 是一个精选开源软件与 AI 工具的目录站，人工策展 + GitHub 自动同步。',
+  description: 'Shelfry 是一个精选开源软件与 AI 工具的目录站，人工策展 + GitHub 自动同步。',
   alternates: { canonical: '/about' },
 }
 
 export default function AboutPage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-5 pb-8 pt-14 md:px-8">
-      <h1 className="text-[32px] font-semibold tracking-[-0.03em] md:text-[40px]">关于 OpenShelf</h1>
+      <h1 className="text-[32px] font-semibold tracking-[-0.03em] md:text-[40px]">关于 Shelfry</h1>
       <p className="mt-4 text-[15px] leading-[1.9] text-ink-soft">
-        OpenShelf 收集真正值得安装的开源软件：macOS、Windows 上的桌面应用与命令行工具，
+        Shelfry 收集真正值得安装的开源软件：macOS、Windows 上的桌面应用与命令行工具，
         以及这两年最热的 AI 工具、MCP Server、插件与 Agent 技能。
       </p>
 

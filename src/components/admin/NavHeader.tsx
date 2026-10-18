@@ -9,7 +9,7 @@ export function NavHeader() {
         <span className="os-nav-head__mark">O</span>
         <span className="os-nav-head__text">
           <span className="os-nav-head__title">内容管理</span>
-          <span className="os-nav-head__sub">OpenShelf</span>
+          <span className="os-nav-head__sub">Shelfry</span>
         </span>
       </div>
       <div className="os-nav-head__actions">

@@ -65,7 +65,7 @@ export default async function CollectionDetailPage({ params }: Params) {
       <div className="mt-8 overflow-hidden rounded-[18px] border border-line bg-surface shadow-window">
         <div className="flex items-center gap-2 border-b border-line bg-surface-soft/70 px-4 py-2.5">
           <TrafficLights />
-          <div className="mx-auto text-[11px] text-muted">OpenShelf · 合集</div>
+          <div className="mx-auto text-[11px] text-muted">Shelfry · 合集</div>
           <div className="w-10" />
         </div>
 

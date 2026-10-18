@@ -12,8 +12,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'OpenShelf · 精选开源软件与 AI 工具',
-    template: '%s · OpenShelf',
+    default: 'Shelfry · 精选开源软件与 AI 工具',
+    template: '%s · Shelfry',
   },
   description:
     '精选 macOS、Windows 开源软件，以及 AI 工具、MCP Server、插件与技能。人工策展 + GitHub 自动同步，每个条目都附安装方式。',
@@ -21,13 +21,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'zh_CN',
-    siteName: 'OpenShelf',
-    title: 'OpenShelf · 精选开源软件与 AI 工具',
+    siteName: 'Shelfry',
+    title: 'Shelfry · 精选开源软件与 AI 工具',
     description: '人工策展 + GitHub 自动同步的开源软件目录。',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OpenShelf · 精选开源软件与 AI 工具',
+    title: 'Shelfry · 精选开源软件与 AI 工具',
     description: '人工策展 + GitHub 自动同步的开源软件目录。',
   },
   alternates: {

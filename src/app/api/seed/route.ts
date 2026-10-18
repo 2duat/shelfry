@@ -257,7 +257,7 @@ export async function POST(request: NextRequest) {
       collection: 'users',
       overrideAccess: true,
       data: {
-        email: process.env.SEED_ADMIN_EMAIL || 'admin@openshelf.local',
+        email: process.env.SEED_ADMIN_EMAIL || 'admin@shelfry.app',
         password: process.env.SEED_ADMIN_PASSWORD || 'admin123456',
         name: '站长',
         role: 'admin',
