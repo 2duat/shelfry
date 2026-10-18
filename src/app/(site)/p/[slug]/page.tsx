@@ -139,15 +139,9 @@ export default async function ItemPage({ params }: Params) {
                 ) : null}
               </div>
 
-              <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-muted md:text-[15px]">
-                {item.tagline || '一个值得关注的开源项目。'}
+              <p className="mt-2.5 max-w-3xl text-[14.5px] leading-[1.8] text-ink-soft md:text-[15px]">
+                {item.summary || item.tagline || '一个值得关注的开源项目。'}
               </p>
-
-              {item.summary ? (
-                <p className="mt-3 max-w-3xl text-[13.8px] leading-[1.8] text-ink-soft">
-                  {item.summary}
-                </p>
-              ) : null}
 
               <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
                 {platforms.map((platform) => (
