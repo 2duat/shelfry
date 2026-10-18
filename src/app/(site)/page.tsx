@@ -60,6 +60,13 @@ export default async function HomePage() {
   const featured = data.featured.length ? data.featured : data.trending.slice(0, 4)
   const featuredIds = new Set(featured.map((item: any) => item.id))
   const picks = data.picks.filter((item: any) => !featuredIds.has(item.id))
+  const editorPicks = picks.length >= 8 ? picks.slice(0, 8) : picks.slice(0, 4)
+  const pickColumns =
+    editorPicks.length >= 4
+      ? 'lg:grid-cols-4'
+      : editorPicks.length === 3
+        ? 'lg:grid-cols-3'
+        : 'lg:grid-cols-2'
   const hasContent = featured.length > 0 || data.latest.length > 0
 
   return (
@@ -224,22 +231,10 @@ export default async function HomePage() {
               href="/search"
               linkLabel="查看全部"
             />
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {picks.slice(0, 8).map((item: any) => (
+            <div className={`grid gap-3 sm:grid-cols-2 ${pickColumns}`}>
+              {editorPicks.map((item: any) => (
                 <ItemCard key={item.id} item={item} />
               ))}
-              {picks.length % 3 !== 0 ? (
-                <Link
-                  href="/search"
-                  className="group flex min-h-[164px] flex-col items-center justify-center gap-2 rounded-[18px] border border-dashed border-line bg-surface/40 p-5 text-center transition hover:border-line-strong hover:bg-surface"
-                >
-                  <span className="grid size-10 place-items-center rounded-full border border-line bg-surface text-muted transition group-hover:text-accent">
-                    <ArrowRight size={16} />
-                  </span>
-                  <span className="text-[13px] font-medium text-ink">查看全部项目</span>
-                  <span className="text-[11.5px] text-muted">共 {data.stats.items} 个</span>
-                </Link>
-              ) : null}
             </div>
           </section>
         ) : null}
