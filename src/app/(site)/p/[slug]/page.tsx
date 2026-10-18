@@ -140,8 +140,14 @@ export default async function ItemPage({ params }: Params) {
               </div>
 
               <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-muted md:text-[15px]">
-                {item.tagline || item.summary || '一个值得关注的开源项目。'}
+                {item.tagline || '一个值得关注的开源项目。'}
               </p>
+
+              {item.summary ? (
+                <p className="mt-3 max-w-3xl text-[13.8px] leading-[1.8] text-ink-soft">
+                  {item.summary}
+                </p>
+              ) : null}
 
               <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
                 {platforms.map((platform) => (
@@ -221,17 +227,8 @@ export default async function ItemPage({ params }: Params) {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_296px]">
         <div className="min-w-0">
-          {item.summary ? (
-            <section>
-              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted">简介</h2>
-              <p className="mt-3 whitespace-pre-line text-[15px] leading-[1.85] text-ink-soft">
-                {item.summary}
-              </p>
-            </section>
-          ) : null}
-
           {shots.length ? (
-            <section className="mt-10">
+            <section className="mt-10 first:mt-0">
               <h2 className="mb-3 text-[13px] font-medium uppercase tracking-wider text-muted">
                 截图
               </h2>
@@ -240,7 +237,7 @@ export default async function ItemPage({ params }: Params) {
           ) : null}
 
           {readme ? (
-            <section className="mt-10">
+            <section className="mt-10 first:mt-0">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted">
                   项目 README
