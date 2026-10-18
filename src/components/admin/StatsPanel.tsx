@@ -2,16 +2,33 @@
 
 import {
   Activity,
+  Boxes,
   CheckCircle2,
   FileText,
+  Folder,
+  History,
+  Image as ImageIcon,
   Inbox,
   Layers,
+  Package,
   Plus,
   RefreshCw,
+  SlidersHorizontal,
+  Tag,
+  Users,
 } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 
 type Stats = {
+  counts: {
+    categories: number
+    tags: number
+    lists: number
+    syncRuns: number
+    media: number
+    users: number
+    submissions: number
+  }
   totals: {
     total: number
     published: number
@@ -110,7 +127,7 @@ export function StatsPanel() {
     )
   }
 
-  const { totals, series, categories, platforms, lastSync } = data
+  const { totals, counts, series, categories, platforms, lastSync } = data
   const maxSeries = Math.max(1, ...series.map((item) => item.count))
   const maxCategory = Math.max(1, ...categories.map((item) => item.count))
 
@@ -121,6 +138,72 @@ export function StatsPanel() {
     { label: '今日更新', value: totals.todayUpdated, icon: RefreshCw, hint: '含自动同步' },
     { label: '草稿', value: totals.drafts, icon: FileText, hint: '等待审核发布' },
     { label: '待审投稿', value: totals.pendingSubmissions, icon: Inbox, hint: totals.pendingSubmissions ? '需要处理' : '暂无' },
+  ]
+
+  const quickLinks = [
+    {
+      name: '软件条目',
+      href: '/admin/collections/items',
+      create: '/admin/collections/items/create',
+      count: totals.total,
+      icon: Package,
+    },
+    {
+      name: '分类',
+      href: '/admin/collections/categories',
+      create: '/admin/collections/categories/create',
+      count: counts.categories,
+      icon: Folder,
+    },
+    {
+      name: '标签',
+      href: '/admin/collections/tags',
+      create: '/admin/collections/tags/create',
+      count: counts.tags,
+      icon: Tag,
+    },
+    {
+      name: '合集',
+      href: '/admin/collections/curated-lists',
+      create: '/admin/collections/curated-lists/create',
+      count: counts.lists,
+      icon: Boxes,
+    },
+    {
+      name: '投稿',
+      href: '/admin/collections/submissions',
+      create: null,
+      count: counts.submissions,
+      icon: Inbox,
+    },
+    {
+      name: '同步记录',
+      href: '/admin/collections/sync-runs',
+      create: null,
+      count: counts.syncRuns,
+      icon: History,
+    },
+    {
+      name: '媒体库',
+      href: '/admin/collections/media',
+      create: '/admin/collections/media/create',
+      count: counts.media,
+      icon: ImageIcon,
+    },
+    {
+      name: '管理员',
+      href: '/admin/collections/users',
+      create: '/admin/collections/users/create',
+      count: counts.users,
+      icon: Users,
+    },
+    {
+      name: '站点设置',
+      href: '/admin/globals/settings',
+      create: null,
+      count: null,
+      icon: SlidersHorizontal,
+    },
   ]
 
   return (
@@ -218,6 +301,38 @@ export function StatsPanel() {
               </span>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="os-quick">
+        <div className="os-quick__head">
+          <div className="os-panel__title">快捷入口</div>
+          <span className="os-stats__muted">共 9 个模块</span>
+        </div>
+        <div className="os-quick__grid">
+          {quickLinks.map((item) => {
+            const Icon = item.icon
+            return (
+              <div className="os-quick__tile" key={item.name}>
+                <a className="os-quick__main" href={item.href}>
+                  <span className="os-quick__icon">
+                    <Icon size={15} />
+                  </span>
+                  <span className="os-quick__text">
+                    <span className="os-quick__name">{item.name}</span>
+                    <span className="os-quick__count">
+                      {item.count === null ? '配置' : `${formatNumber(item.count)} 条`}
+                    </span>
+                  </span>
+                </a>
+                {item.create ? (
+                  <a className="os-quick__add" href={item.create} aria-label={`新建${item.name}`}>
+                    +
+                  </a>
+                ) : null}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

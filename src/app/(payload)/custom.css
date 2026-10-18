@@ -750,3 +750,121 @@ html[data-theme='dark'] .os-stats__alert {
   font-weight: 650;
   color: var(--theme-elevation-1000);
 }
+
+/* ---------- 快捷入口 ---------- */
+.os-quick {
+  margin-top: 10px;
+  padding: 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 14px;
+  background: var(--theme-elevation-0);
+}
+
+.os-quick__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.os-quick__head .os-panel__title {
+  margin-bottom: 0;
+}
+
+.os-quick__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 1000px) {
+  .os-quick__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .os-quick__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.os-quick__tile {
+  position: relative;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 11px;
+  background: var(--theme-elevation-50);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.os-quick__tile:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--os-accent) 40%, var(--theme-border-color));
+  box-shadow: 0 6px 18px -12px rgba(0, 0, 0, 0.4);
+}
+
+.os-quick__main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 40px 11px 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.os-quick__icon {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--os-accent-soft);
+  color: var(--os-accent);
+}
+
+.os-quick__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.os-quick__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theme-elevation-1000);
+}
+
+.os-quick__count {
+  font-size: 11px;
+  color: var(--theme-elevation-450);
+}
+
+.os-quick__add {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 50%;
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-500);
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.os-quick__add:hover {
+  border-color: var(--os-accent);
+  color: var(--os-accent);
+}
+
+/* 默认的集合入口由「快捷入口」统一承载 */
+.dashboard .collections {
+  display: none;
+}

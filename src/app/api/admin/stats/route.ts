@@ -115,6 +115,16 @@ export async function GET(request: NextRequest) {
     })),
   )
 
+  const [tagsCount, listsCount, runsCount, mediaCount, usersCount, submissionsCount] =
+    await Promise.all([
+      payload.count({ collection: 'tags', overrideAccess: true }),
+      payload.count({ collection: 'curated-lists', overrideAccess: true }),
+      payload.count({ collection: 'sync-runs', overrideAccess: true }),
+      payload.count({ collection: 'media', overrideAccess: true }),
+      payload.count({ collection: 'users', overrideAccess: true }),
+      payload.count({ collection: 'submissions', overrideAccess: true }),
+    ])
+
   const run = lastSync.docs[0] as any
 
   return NextResponse.json({
@@ -127,6 +137,15 @@ export async function GET(request: NextRequest) {
       todayUpdated: todayUpdated.totalDocs,
       pendingSubmissions: pending.totalDocs,
       failedSync: failed.totalDocs,
+    },
+    counts: {
+      categories: categories.docs.length,
+      tags: tagsCount.totalDocs,
+      lists: listsCount.totalDocs,
+      syncRuns: runsCount.totalDocs,
+      media: mediaCount.totalDocs,
+      users: usersCount.totalDocs,
+      submissions: submissionsCount.totalDocs,
     },
     series,
     categories: categoryCounts
