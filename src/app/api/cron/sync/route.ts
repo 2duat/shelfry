@@ -109,19 +109,28 @@ async function runRefresh(payload: any, limit: number, integration: any) {
 async function runEnrich(payload: any, limit: number, integration: any) {
   const stats = { enriched: 0, failed: 0 }
 
-  const drafts = await payload.find({
+  const candidates = await payload.find({
     collection: 'items',
-    where: { status: { equals: 'draft' } },
+    where: {
+      and: [
+        { status: { in: ['draft', 'published'] } },
+        { aiEnriched: { not_equals: true } },
+      ],
+    },
     sort: '-createdAt',
-    limit,
+    limit: Math.max(30, limit * 5),
     depth: 0,
   })
 
-  for (const item of drafts.docs) {
+  let processed = 0
+
+  for (const item of candidates.docs) {
+    if (processed >= limit) break
     if (!item.repoUrl) continue
-    if (item.tagline && item.summary && item.aiMeta?.enrichedAt) continue
+    if (item.aiMeta?.enrichedAt) continue
     const lastAttempt = item.aiMeta?.lastAttemptAt ? new Date(item.aiMeta.lastAttemptAt).getTime() : 0
     if (lastAttempt && Date.now() - lastAttempt < 24 * 60 * 60 * 1000) continue
+    processed += 1
     try {
       const info = await fetchRepoInfo(item.repoUrl, integration.githubToken)
       const enrichment = await enrichWithAI(info, integration)
@@ -135,8 +144,14 @@ async function runEnrich(payload: any, limit: number, integration: any) {
         overrideAccess: true,
         context: { skipGithub: true },
         data: {
-          tagline: item.tagline || enrichment.tagline,
-          summary: item.summary || enrichment.summary,
+          tagline:
+            item.source === 'discovery' && !item.aiMeta?.enrichedAt
+              ? enrichment.tagline
+              : item.tagline || enrichment.tagline,
+          summary:
+            item.source === 'discovery' && !item.aiMeta?.enrichedAt
+              ? enrichment.summary
+              : item.summary || enrichment.summary,
           kind: item.kind || enrichment.kind,
           ...(categoryId ? { category: categoryId } : {}),
           platforms: item.platforms?.length ? item.platforms : enrichment.platforms,

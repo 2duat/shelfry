@@ -183,6 +183,9 @@ export const Items: CollectionConfig = {
           data.publishedAt = new Date().toISOString()
         }
 
+        const aiMeta = (data as any).aiMeta ?? (originalDoc as any)?.aiMeta
+        ;(data as any).aiEnriched = Boolean(aiMeta?.enrichedAt)
+
         return data
       },
     ],
@@ -493,6 +496,14 @@ export const Items: CollectionConfig = {
                   ],
                 },
                 { name: 'aiMeta', label: 'AI 元信息', type: 'json', admin: { readOnly: true } },
+                {
+                  name: 'aiEnriched',
+                  label: 'AI 已补全',
+                  type: 'checkbox',
+                  defaultValue: false,
+                  index: true,
+                  admin: { readOnly: true },
+                },
               ],
             },
             {

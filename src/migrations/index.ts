@@ -3,6 +3,7 @@ import * as migration_20261018_092742_add_readme from './20261018_092742_add_rea
 import * as migration_20261018_101939_add_tags_task from './20261018_101939_add_tags_task';
 import * as migration_20261018_115450_brand_shelfry from './20261018_115450_brand_shelfry';
 import * as migration_20261018_121119_review_hardening from './20261018_121119_review_hardening';
+import * as migration_20261018_152027_enrich_flag from './20261018_152027_enrich_flag';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20261018_121119_review_hardening.up,
     down: migration_20261018_121119_review_hardening.down,
-    name: '20261018_121119_review_hardening'
+    name: '20261018_121119_review_hardening',
+  },
+  {
+    up: migration_20261018_152027_enrich_flag.up,
+    down: migration_20261018_152027_enrich_flag.down,
+    name: '20261018_152027_enrich_flag'
   },
 ];
