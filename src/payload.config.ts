@@ -28,6 +28,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      beforeNavLinks: ['/components/admin/NavHeader#NavHeader'],
       graphics: {
         Logo: '/components/admin/Brand#Logo',
         Icon: '/components/admin/Brand#Icon',

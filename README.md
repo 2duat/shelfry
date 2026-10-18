@@ -8,6 +8,8 @@
 
 ![后台登录](docs/screenshots/admin-login.png)
 
+![后台仪表盘](docs/screenshots/admin-dashboard.png)
+
 ---
 
 ## 能做什么

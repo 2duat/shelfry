@@ -44,7 +44,7 @@ export const Items: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     group: '内容',
-    defaultColumns: ['name', 'kind', 'status', 'stars', 'score', 'updatedAt'],
+    defaultColumns: ['name', 'kind', 'status', 'stars', 'updatedAt'],
     listSearchableFields: ['name', 'githubFullName', 'tagline', 'tagsText'],
     description:
       '最短用法：只填「GitHub 地址」→ 保存。系统会自动抓取仓库信息、生成中文介绍与标签，之后你再微调即可。',
