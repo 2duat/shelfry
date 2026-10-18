@@ -3,21 +3,13 @@ import { enrichWithAI } from '../lib/ai'
 import { fetchRepoInfo } from '../lib/github'
 import { computeScore } from '../lib/score'
 import { slugify } from '../lib/slug'
+import { syncItemTags } from '../lib/tags'
 import { authenticated, publishedOrAuthenticated } from './access'
 
 function asArray(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String)
   return []
 }
-
-function splitTags(value: unknown): string[] {
-  if (typeof value !== 'string') return []
-  return value
-    .split(/[,，]/)
-    .map((t) => t.trim())
-    .filter(Boolean)
-}
-
 
 async function uniqueItemSlug(payload: any, base: string, currentId?: string | number) {
   const root = slugify(base)
@@ -50,7 +42,7 @@ export const Items: CollectionConfig = {
       beforeListTable: ['/components/admin/GithubImport#GithubImport'],
     },
     description:
-      '最短用法：只填「GitHub 地址」→ 保存。系统会自动抓取仓库信息、生成中文介绍与标签，之后你再微调即可。',
+      '常用信息都在第一屏；发布状态、推荐位在右侧栏。自动抓取的字段收在「GitHub 数据」里，平时不用管。',
   },
   access: {
     read: publishedOrAuthenticated,
@@ -177,48 +169,141 @@ export const Items: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [
+      async ({ doc, req }) => {
+        if ((req.context as any)?.skipTagSync) return doc
+        try {
+          await syncItemTags(req.payload as any, doc, req)
+        } catch (error) {
+          req.payload.logger.warn(`[items] 标签同步失败: ${String(error)}`)
+        }
+        return doc
+      },
+    ],
   },
   fields: [
+    /* ---------- 右侧栏：发布与推荐 ---------- */
+    {
+      name: 'status',
+      label: '状态',
+      type: 'select',
+      defaultValue: 'draft',
+      required: true,
+      index: true,
+      admin: { position: 'sidebar' },
+      options: [
+        { label: '草稿', value: 'draft' },
+        { label: '已发布', value: 'published' },
+        { label: '已隐藏', value: 'hidden' },
+      ],
+    },
+    {
+      name: 'featured',
+      label: '首页推荐',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'editorsPick',
+      label: '编辑精选',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'publishedAt',
+      label: '发布时间',
+      type: 'date',
+      admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
+    },
+    {
+      name: 'syncNow',
+      label: '重新抓取 GitHub',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: '保存时重新拉取星标、更新时间与 AI 文案',
+      },
+    },
+
+    /* ---------- 主区域 ---------- */
     {
       type: 'tabs',
       tabs: [
         {
-          label: '基本信息',
+          label: '内容',
           fields: [
             {
               name: 'repoUrl',
               label: 'GitHub 地址',
               type: 'text',
               admin: {
-                description: '粘贴 https://github.com/owner/repo 后保存，其余内容会自动补全',
+                description: '粘贴后保存会自动补全；也可以直接用列表页的「一键导入」',
                 placeholder: 'https://github.com/owner/repo',
               },
             },
             {
-              name: 'syncNow',
-              label: '重新抓取 GitHub',
-              type: 'checkbox',
-              defaultValue: false,
-              admin: { description: '勾选后保存会重新拉取星标、更新时间和 AI 文案（会覆盖自动生成的内容）' },
+              type: 'row',
+              fields: [
+                { name: 'name', label: '名称', type: 'text', required: true, admin: { width: '60%' } },
+                {
+                  name: 'slug',
+                  label: 'URL 标识',
+                  type: 'text',
+                  unique: true,
+                  index: true,
+                  admin: { width: '40%' },
+                },
+              ],
             },
-            { name: 'name', label: '名称', type: 'text', required: true },
-            { name: 'slug', label: 'URL 标识', type: 'text', unique: true, index: true },
-            { name: 'tagline', label: '一句话介绍', type: 'text', admin: { description: '建议 20–40 字' } },
-            { name: 'summary', label: '简介', type: 'textarea', admin: { description: '150–220 字，标签页和列表页会用到' } },
             {
-              name: 'kind',
-              label: '类型',
-              type: 'select',
-              defaultValue: 'app',
-              options: [
-                { label: '应用', value: 'app' },
-                { label: '命令行工具', value: 'cli' },
-                { label: '插件 / 扩展', value: 'plugin' },
-                { label: 'AI 工具', value: 'ai-tool' },
-                { label: 'AI 技能', value: 'ai-skill' },
-                { label: 'MCP Server', value: 'mcp-server' },
-                { label: '提示词', value: 'prompt' },
-                { label: '工作流', value: 'workflow' },
+              name: 'tagline',
+              label: '一句话介绍',
+              type: 'text',
+              admin: { description: '建议 20–40 字，用于列表卡片' },
+            },
+            {
+              name: 'summary',
+              label: '简介',
+              type: 'textarea',
+              admin: { description: '150–220 字，详情页顶部展示' },
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'kind',
+                  label: '类型',
+                  type: 'select',
+                  defaultValue: 'app',
+                  admin: { width: '34%' },
+                  options: [
+                    { label: '应用', value: 'app' },
+                    { label: '命令行工具', value: 'cli' },
+                    { label: '插件 / 扩展', value: 'plugin' },
+                    { label: 'AI 工具', value: 'ai-tool' },
+                    { label: 'AI 技能', value: 'ai-skill' },
+                    { label: 'MCP Server', value: 'mcp-server' },
+                    { label: '提示词', value: 'prompt' },
+                    { label: '工作流', value: 'workflow' },
+                  ],
+                },
+                {
+                  name: 'pricing',
+                  label: '收费模式',
+                  type: 'select',
+                  defaultValue: 'open-source',
+                  admin: { width: '33%' },
+                  options: [
+                    { label: '完全开源', value: 'open-source' },
+                    { label: '免费', value: 'free' },
+                    { label: '免费增值', value: 'freemium' },
+                    { label: '付费', value: 'paid' },
+                  ],
+                },
+                { name: 'license', label: '开源协议', type: 'text', admin: { width: '33%' } },
               ],
             },
             {
@@ -251,37 +336,63 @@ export const Items: CollectionConfig = {
                 { label: '其他', value: 'other' },
               ],
             },
-            { name: 'category', label: '分类', type: 'relationship', relationTo: 'categories' },
-            { name: 'tags', label: '标签', type: 'relationship', relationTo: 'tags', hasMany: true },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'category',
+                  label: '分类',
+                  type: 'relationship',
+                  relationTo: 'categories',
+                  admin: { width: '50%' },
+                },
+                {
+                  name: 'tags',
+                  label: '标签',
+                  type: 'relationship',
+                  relationTo: 'tags',
+                  hasMany: true,
+                  admin: {
+                    width: '50%',
+                    description: '导入时会根据标签文本自动创建并关联',
+                  },
+                },
+              ],
+            },
             {
               name: 'tagsText',
               label: '标签文本',
               type: 'text',
-              admin: { description: '逗号分隔，自动生成，用于筛选与搜索' },
+              admin: { description: '逗号分隔；用于自动生成上面的标签' },
             },
             {
-              name: 'pricing',
-              label: '收费模式',
-              type: 'select',
-              defaultValue: 'open-source',
-              options: [
-                { label: '完全开源', value: 'open-source' },
-                { label: '免费', value: 'free' },
-                { label: '免费增值', value: 'freemium' },
-                { label: '付费', value: 'paid' },
-              ],
+              name: 'features',
+              label: '核心功能',
+              type: 'array',
+              fields: [{ name: 'text', label: '内容', type: 'text', required: true }],
             },
-            { name: 'license', label: '开源协议', type: 'text' },
+            { name: 'body', label: '正文', type: 'richText' },
+            { name: 'audience', label: '适合人群', type: 'text' },
           ],
         },
         {
-          label: '链接与外观',
+          label: '链接与图片',
           fields: [
-            { name: 'homepage', label: '官网', type: 'text' },
-            { name: 'downloadUrl', label: '下载地址', type: 'text' },
+            {
+              type: 'row',
+              fields: [
+                { name: 'homepage', label: '官网', type: 'text', admin: { width: '50%' } },
+                { name: 'downloadUrl', label: '下载地址', type: 'text', admin: { width: '50%' } },
+              ],
+            },
             { name: 'installCommand', label: '安装命令', type: 'text' },
-            { name: 'iconUrl', label: '图标地址', type: 'text' },
-            { name: 'coverUrl', label: '封面图地址', type: 'text' },
+            {
+              type: 'row',
+              fields: [
+                { name: 'iconUrl', label: '图标地址', type: 'text', admin: { width: '50%' } },
+                { name: 'coverUrl', label: '封面图地址', type: 'text', admin: { width: '50%' } },
+              ],
+            },
             {
               name: 'screenshots',
               label: '截图',
@@ -294,81 +405,88 @@ export const Items: CollectionConfig = {
           ],
         },
         {
-          label: '详细介绍',
-          fields: [
-            {
-              name: 'features',
-              label: '核心功能',
-              type: 'array',
-              fields: [{ name: 'text', label: '内容', type: 'text', required: true }],
-            },
-            { name: 'body', label: '正文', type: 'richText' },
-            { name: 'audience', label: '适合人群', type: 'text' },
-            {
-              name: 'readme',
-              label: 'README（自动抓取）',
-              type: 'textarea',
-              maxLength: 120000,
-              admin: {
-                readOnly: true,
-                description: '详情页的 README 阅读区内容，导入或刷新时自动抓取',
-              },
-            },
-          ],
-        },
-        {
           label: 'GitHub 数据',
           fields: [
-            { name: 'githubFullName', label: 'owner/repo', type: 'text', index: true, admin: { readOnly: true } },
-            { name: 'stars', label: 'Stars', type: 'number', admin: { readOnly: true } },
-            { name: 'forks', label: 'Forks', type: 'number', admin: { readOnly: true } },
-            { name: 'language', label: '主要语言', type: 'text', admin: { readOnly: true } },
-            { name: 'topicsText', label: 'Topics', type: 'text', admin: { readOnly: true } },
-            { name: 'lastCommitAt', label: '最后提交', type: 'date', admin: { readOnly: true } },
-            { name: 'latestRelease', label: '最新版本', type: 'text', admin: { readOnly: true } },
-            { name: 'archived', label: '已归档', type: 'checkbox', admin: { readOnly: true } },
             {
-              name: 'lastSyncedAt',
-              label: '上次同步',
-              type: 'date',
-              admin: { readOnly: true },
-            },
-            {
-              name: 'source',
-              label: '来源',
-              type: 'select',
-              defaultValue: 'manual',
-              options: [
-                { label: '手动录入', value: 'manual' },
-                { label: '自动发现', value: 'discovery' },
-                { label: '榜单导入', value: 'awesome' },
-                { label: '用户投稿', value: 'submission' },
+              type: 'collapsible',
+              label: '仓库信息（自动抓取）',
+              admin: { initCollapsed: true },
+              fields: [
+                { name: 'githubFullName', label: 'owner/repo', type: 'text', index: true, admin: { readOnly: true } },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'stars', label: 'Stars', type: 'number', admin: { readOnly: true, width: '33%' } },
+                    { name: 'forks', label: 'Forks', type: 'number', admin: { readOnly: true, width: '33%' } },
+                    { name: 'language', label: '主要语言', type: 'text', admin: { readOnly: true, width: '34%' } },
+                  ],
+                },
+                { name: 'topicsText', label: 'Topics', type: 'text', admin: { readOnly: true } },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'lastCommitAt', label: '最后提交', type: 'date', admin: { readOnly: true, width: '50%' } },
+                    { name: 'latestRelease', label: '最新版本', type: 'text', admin: { readOnly: true, width: '50%' } },
+                  ],
+                },
+                { name: 'archived', label: '已归档', type: 'checkbox', admin: { readOnly: true } },
+                {
+                  name: 'lastSyncedAt',
+                  label: '上次同步',
+                  type: 'date',
+                  admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } },
+                },
+                {
+                  name: 'source',
+                  label: '来源',
+                  type: 'select',
+                  defaultValue: 'manual',
+                  options: [
+                    { label: '手动录入', value: 'manual' },
+                    { label: '自动发现', value: 'discovery' },
+                    { label: '榜单导入', value: 'awesome' },
+                    { label: '用户投稿', value: 'submission' },
+                  ],
+                },
               ],
             },
-            { name: 'aiMeta', label: 'AI 元信息', type: 'json', admin: { readOnly: true } },
+            {
+              type: 'collapsible',
+              label: '排序与统计',
+              admin: { initCollapsed: true },
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'score', label: '排序分', type: 'number', admin: { readOnly: true, width: '50%' } },
+                    { name: 'clicks', label: '外链点击', type: 'number', defaultValue: 0, admin: { readOnly: true, width: '50%' } },
+                  ],
+                },
+                { name: 'aiMeta', label: 'AI 元信息', type: 'json', admin: { readOnly: true } },
+              ],
+            },
+            {
+              type: 'collapsible',
+              label: 'README 内容',
+              admin: { initCollapsed: true },
+              fields: [
+                {
+                  name: 'readme',
+                  label: 'README',
+                  type: 'textarea',
+                  maxLength: 120000,
+                  admin: {
+                    readOnly: true,
+                    description: '详情页 README 阅读区的内容，导入或刷新时自动抓取',
+                  },
+                },
+              ],
+            },
           ],
         },
         {
-          label: '发布设置',
+          label: 'SEO',
           fields: [
-            {
-              name: 'status',
-              label: '状态',
-              type: 'select',
-              defaultValue: 'draft',
-              required: true,
-              index: true,
-              options: [
-                { label: '草稿', value: 'draft' },
-                { label: '已发布', value: 'published' },
-                { label: '已隐藏', value: 'hidden' },
-              ],
-            },
-            { name: 'featured', label: '首页推荐', type: 'checkbox', defaultValue: false },
-            { name: 'editorsPick', label: '编辑精选', type: 'checkbox', defaultValue: false },
-            { name: 'score', label: '排序分', type: 'number', admin: { readOnly: true } },
-            { name: 'publishedAt', label: '发布时间', type: 'date' },
-            { name: 'clicks', label: '外链点击', type: 'number', defaultValue: 0, admin: { readOnly: true } },
             {
               name: 'seo',
               label: 'SEO',
@@ -378,16 +496,17 @@ export const Items: CollectionConfig = {
                 { name: 'description', label: '描述', type: 'textarea' },
               ],
             },
-            {
-              name: 'searchText',
-              label: '搜索文本',
-              type: 'text',
-              index: true,
-              admin: { hidden: true, readOnly: true },
-            },
           ],
         },
       ],
+    },
+
+    {
+      name: 'searchText',
+      label: '搜索文本',
+      type: 'text',
+      index: true,
+      admin: { hidden: true, readOnly: true },
     },
   ],
 }

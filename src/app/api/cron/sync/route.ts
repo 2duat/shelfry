@@ -5,6 +5,7 @@ import { enrichWithAI } from '@/lib/ai'
 import { fetchRepoInfo, inferKind, inferPlatforms, guessPricing } from '@/lib/github'
 import { getPayloadClient } from '@/lib/payload'
 import { slugify } from '@/lib/slug'
+import { syncItemTags } from '@/lib/tags'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -287,6 +288,32 @@ async function runReadme(payload: any, limit: number) {
   return stats
 }
 
+
+async function runTags(payload: any, limit: number) {
+  const stats = { linked: 0, failed: 0 }
+
+  const docs = await payload.find({
+    collection: 'items',
+    where: {
+      tags: { exists: false },
+    },
+    limit,
+    depth: 0,
+  })
+
+  for (const item of docs.docs) {
+    try {
+      const linked = await syncItemTags(payload, item)
+      if (linked) stats.linked += 1
+    } catch (error) {
+      stats.failed += 1
+      console.error('[cron:tags] failed', item.slug, String(error))
+    }
+  }
+
+  return stats
+}
+
 export async function GET(request: NextRequest) {
   if (!authorized(request)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
@@ -306,7 +333,9 @@ export async function GET(request: NextRequest) {
             ? 'enrich'
             : task === 'readme'
               ? 'readme'
-              : 'refresh',
+              : task === 'tags'
+                ? 'tags'
+                : 'refresh',
       status: 'running',
       trigger: 'cron',
       startedAt: new Date().toISOString(),
@@ -321,6 +350,7 @@ export async function GET(request: NextRequest) {
     if (task === 'discover') stats = await runDiscover(payload)
     else if (task === 'enrich') stats = await runEnrich(payload, 6)
     else if (task === 'readme') stats = await runReadme(payload, 20)
+    else if (task === 'tags') stats = await runTags(payload, 40)
     else stats = await runRefresh(payload, refreshLimit)
 
     await payload.update({
