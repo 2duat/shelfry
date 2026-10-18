@@ -10,6 +10,7 @@ export type ListParams = {
   q?: string
   tag?: string
   pricing?: string
+  pick?: 'featured' | 'editors'
   minStars?: number
   sort?: string
   page?: number
@@ -49,6 +50,8 @@ function buildWhere(params: ListParams, categoryId?: string | number) {
   if (params.host) where.host = { equals: params.host }
   if (categoryId) where.category = { equals: categoryId }
   if (params.pricing) where.pricing = { equals: params.pricing }
+  if (params.pick === 'featured') where.featured = { equals: true }
+  if (params.pick === 'editors') where.editorsPick = { equals: true }
   if (params.minStars) where.stars = { greater_than_equal: params.minStars }
   if (params.tag) where.tagsText = { like: params.tag }
 
@@ -92,6 +95,21 @@ export async function listItems(params: ListParams = {}) {
     return emptyPage()
   }
 }
+
+export const getProjectCounts = cache(async () => {
+  try {
+    const payload = await getPayloadClient()
+    const published = { status: { equals: 'published' } }
+    const [all, featured, editors] = await Promise.all([
+      payload.count({ collection: 'items', where: published }),
+      payload.count({ collection: 'items', where: { ...published, featured: { equals: true } } }),
+      payload.count({ collection: 'items', where: { ...published, editorsPick: { equals: true } } }),
+    ])
+    return { all: all.totalDocs, featured: featured.totalDocs, editors: editors.totalDocs }
+  } catch {
+    return { all: 0, featured: 0, editors: 0 }
+  }
+})
 
 function emptyPage() {
   return { docs: [], totalDocs: 0, totalPages: 0, page: 1, hasNextPage: false, hasPrevPage: false }

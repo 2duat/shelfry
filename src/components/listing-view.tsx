@@ -14,8 +14,10 @@ export async function ListingView({
   fixedKinds,
   fixedPlatform,
   hideKind = false,
+  pick,
   searchParams,
   emptyHint,
+  tabs,
 }: {
   title: string
   subtitle?: string
@@ -23,8 +25,10 @@ export async function ListingView({
   fixedKinds?: string[]
   fixedPlatform?: string
   hideKind?: boolean
+  pick?: 'featured' | 'editors'
   searchParams: SearchParams
   emptyHint?: string
+  tabs?: React.ReactNode
 }) {
   const rawPage = Number(searchParams.page)
   const page = Number.isFinite(rawPage) ? Math.max(1, Math.trunc(rawPage)) : 1
@@ -43,6 +47,7 @@ export async function ListingView({
     kind,
     pricing,
     sort,
+    pick,
     minStars,
     page,
     limit: 24,
@@ -62,7 +67,9 @@ export async function ListingView({
         </p>
       </header>
 
-      <div className="mt-6">
+      {tabs ? <div className="mt-5">{tabs}</div> : null}
+
+      <div className="mt-5">
         <Suspense fallback={<div className="h-[92px] rounded-[16px] border border-line bg-surface" />}>
           <FilterBar hideKind={hideKind} />
         </Suspense>

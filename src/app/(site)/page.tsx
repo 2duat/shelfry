@@ -180,7 +180,7 @@ export default async function HomePage() {
                   <SectionHeading
                     title="精选推荐"
                     subtitle="编辑挑选，值得先试的那几个"
-                    href="/projects"
+                    href="/projects?pick=featured"
                     linkLabel="更多"
                   />
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -229,7 +229,7 @@ export default async function HomePage() {
             <SectionHeading
               title="编辑精选"
               subtitle="每一个都亲手试过"
-              href="/projects"
+              href="/projects?pick=editors"
               linkLabel="查看全部"
             />
             <div className={`grid gap-3 sm:grid-cols-2 ${pickColumns}`}>
@@ -247,7 +247,7 @@ export default async function HomePage() {
               <SectionHeading
                 title="最新收录"
                 subtitle="刚同步进来的项目"
-                href="/projects"
+                href="/projects?sort=newest"
                 linkLabel="全部"
               />
               <div className="grid gap-2.5 sm:grid-cols-2">
