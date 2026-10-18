@@ -49,7 +49,13 @@ export default async function SearchPage({
           「{query}」找到 <span className="tabular-nums text-ink-soft">{result.totalDocs}</span> 个结果
         </p>
       ) : (
-        <p className="mt-5 text-[12.5px] text-muted">输入关键词开始搜索，按 ⌘K 可随时唤起快捷搜索。</p>
+        <p className="mt-5 text-[12.5px] text-muted">
+          输入关键词开始搜索，按 ⌘K 可随时唤起快捷搜索，或者
+          <a href="/projects" className="ml-1 text-accent">
+            浏览全部项目
+          </a>
+          。
+        </p>
       )}
 
       {result.docs.length ? (

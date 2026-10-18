@@ -13,6 +13,7 @@ import { ThemeToggle } from './theme-toggle'
 
 const NAV = [
   { href: '/', label: '发现' },
+  { href: '/projects', label: '全部' },
   { href: '/macos', label: 'macOS' },
   { href: '/windows', label: 'Windows' },
   { href: '/ai', label: 'AI' },

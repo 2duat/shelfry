@@ -134,7 +134,7 @@ export default async function HomePage() {
               <p className="mt-1 text-[12.5px] text-muted">从你正在用的系统开始</p>
             </div>
             <Link
-              href="/search"
+              href="/projects"
               className="group inline-flex shrink-0 items-center gap-1 text-[12.5px] text-muted transition hover:text-accent"
             >
               全部软件
@@ -179,7 +179,7 @@ export default async function HomePage() {
                   <SectionHeading
                     title="精选推荐"
                     subtitle="编辑挑选，值得先试的那几个"
-                    href="/search"
+                    href="/projects"
                     linkLabel="更多"
                   />
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -228,7 +228,7 @@ export default async function HomePage() {
             <SectionHeading
               title="编辑精选"
               subtitle="每一个都亲手试过"
-              href="/search"
+              href="/projects"
               linkLabel="查看全部"
             />
             <div className={`grid gap-3 sm:grid-cols-2 ${pickColumns}`}>
@@ -246,7 +246,7 @@ export default async function HomePage() {
               <SectionHeading
                 title="最新收录"
                 subtitle="刚同步进来的项目"
-                href="/search"
+                href="/projects"
                 linkLabel="全部"
               />
               <div className="grid gap-2.5 sm:grid-cols-2">

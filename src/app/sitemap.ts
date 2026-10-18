@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getCollections(100),
   ])
 
-  const staticRoutes = ['', '/macos', '/windows', '/ai', '/plugins', '/collections', '/submit', '/about'].map(
+  const staticRoutes = ['', '/projects', '/macos', '/windows', '/ai', '/plugins', '/collections', '/submit', '/about'].map(
     (path) => ({
       url: `${base}${path}`,
       lastModified: new Date(),
