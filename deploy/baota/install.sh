@@ -16,8 +16,12 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
-echo "==> 安装依赖"
-npm ci
+echo "==> 安装依赖（包含构建所需的 devDependencies）"
+npm ci --include=dev
+
+echo "==> 生成 Payload 类型与后台组件映射"
+npm run generate:types
+npm run generate:importmap
 
 echo "==> 生成数据库表结构"
 npm run migrate

@@ -7,8 +7,12 @@ cd "$ROOT"
 echo "==> 拉取最新代码"
 git pull --ff-only
 
-echo "==> 安装依赖"
-npm ci
+echo "==> 安装依赖（包含构建所需的 devDependencies）"
+npm ci --include=dev
+
+echo "==> 重新生成 Payload 类型与后台组件映射"
+npm run generate:types
+npm run generate:importmap
 
 echo "==> 执行数据库迁移"
 npm run migrate

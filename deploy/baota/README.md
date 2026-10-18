@@ -104,11 +104,16 @@ bash deploy/baota/install.sh
 脚本会依次执行：
 
 ```bash
-npm ci            # 必须在 Linux 上装，sharp 是平台相关二进制
-npm run migrate   # 建表
+npm ci --include=dev      # 必须在 Linux 上装，sharp 是平台相关二进制
+npm run generate:types    # 生成 src/payload-types.ts（未提交到 Git）
+npm run generate:importmap# 生成后台组件映射（未提交到 Git）
+npm run migrate           # 建表
 npm run build
 mkdir -p uploads logs
 ```
+
+> `payload-types.ts` 和 `importMap.js` 是构建产物，仓库里没有提交，所以**
+> 每次部署都必须先执行这两条生成命令**，否则 `npm run build` 会报模块缺失。
 
 > 首次构建约 2–4 分钟。2G 内存如果卡住，先加 swap：
 > `fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile`
