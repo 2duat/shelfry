@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 
 import { KINDS, PLATFORMS, PRICINGS, SORTS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
@@ -18,27 +18,46 @@ export function FilterBar({ hideKind = false }: { hideKind?: boolean }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
+
+  const base = {
+    platform: searchParams.get('platform') || 'all',
+    kind: searchParams.get('kind') || 'all',
+    pricing: searchParams.get('pricing') || 'all',
+    sort: searchParams.get('sort') || 'recommended',
+    stars: searchParams.get('stars') || 'all',
+  }
+  const [filters, setFilters] = useState(base)
+
+  useEffect(() => {
+    if (!isPending) setFilters(base)
+  }, [isPending, searchParams])
 
   const setParam = useCallback(
-    (key: string, value: string) => {
+    (key: keyof typeof base, value: string) => {
+      if (isPending) return
+
       const next = new URLSearchParams(searchParams.toString())
       if (!value || value === 'all') next.delete(key)
       else next.set(key, value)
       next.delete('page')
       const query = next.toString()
-      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
+
+      startTransition(() => {
+        setFilters((prev) => ({ ...prev, [key]: value }))
+        router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
+      })
     },
-    [pathname, router, searchParams],
+    [isPending, pathname, router, searchParams, startTransition],
   )
 
-  const platform = searchParams.get('platform') || 'all'
-  const kind = searchParams.get('kind') || 'all'
-  const pricing = searchParams.get('pricing') || 'all'
-  const sort = searchParams.get('sort') || 'recommended'
-  const stars = searchParams.get('stars') || 'all'
+  const { platform, kind, pricing, sort, stars } = filters
 
   return (
-    <div className="rounded-[16px] border border-line bg-surface p-2.5">
+    <div
+      aria-busy={isPending}
+      className={`rounded-[16px] border border-line bg-surface p-2.5 transition-opacity ${isPending ? 'pointer-events-none opacity-60' : ''}`}
+    >
       <div className="flex flex-wrap items-center gap-1.5">
         <FilterChip active={platform === 'all'} onClick={() => setParam('platform', 'all')}>
           全部平台
