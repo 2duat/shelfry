@@ -136,7 +136,7 @@ export const Items: CollectionConfig = {
               : enrich.features.map((text) => ({ text }))
           data.aiMeta = {
             generated: enrich.aiGenerated,
-            model: enrich.aiGenerated ? process.env.LLM_MODEL || null : null,
+            model: enrich.aiGenerated ? integration.model || null : null,
             enrichedAt: new Date().toISOString(),
             categoryHint: enrich.categoryHint,
             audience: enrich.audience,

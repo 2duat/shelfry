@@ -82,7 +82,7 @@ GITHUB_TOKEN=ghp_xxx
 # 可选：不填就只用规则化摘要，不调用大模型
 LLM_BASE_URL=https://api.deepseek.com/v1
 LLM_API_KEY=sk-xxx
-LLM_MODEL=deepseek-chat
+LLM_MODEL=deepseek-flash
 ```
 
 生成密钥：

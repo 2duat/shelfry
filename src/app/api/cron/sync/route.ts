@@ -157,7 +157,7 @@ async function runEnrich(payload: any, limit: number, integration: any) {
               : enrichment.features.map((text: string) => ({ text })),
           aiMeta: {
             generated: enrichment.aiGenerated,
-            model: process.env.LLM_MODEL || null,
+            model: integration.model || null,
             enrichedAt: new Date().toISOString(),
             categoryHint: enrichment.categoryHint,
           },

@@ -104,7 +104,7 @@ npm run seed
 | `GITHUB_TOKEN` | 建议 | 只读 Token，匿名配额只有 60 次/小时 |
 | `LLM_BASE_URL` | 可选 | OpenAI 兼容接口，如 `https://api.deepseek.com/v1` |
 | `LLM_API_KEY` | 可选 | 不填则使用规则化摘要 |
-| `LLM_MODEL` | 可选 | 如 `deepseek-chat` |
+| `LLM_MODEL` | 可选 | 如 `deepseek-flash` |
 
 ---
 

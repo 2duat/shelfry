@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         lastSyncedAt: new Date().toISOString(),
         aiMeta: {
           generated: enrichment.aiGenerated,
-          model: enrichment.aiGenerated ? process.env.LLM_MODEL || null : null,
+          model: enrichment.aiGenerated ? integration.model || null : null,
           enrichedAt: new Date().toISOString(),
           categoryHint: enrichment.categoryHint,
           audience: enrichment.audience,

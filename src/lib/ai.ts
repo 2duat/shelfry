@@ -141,7 +141,7 @@ type AIConfig = {
 export async function enrichWithAI(info: RepoInfo, config?: AIConfig): Promise<Enrichment> {
   const baseUrl = config?.baseUrl || process.env.LLM_BASE_URL
   const apiKey = config?.apiKey || process.env.LLM_API_KEY
-  const model = config?.model || process.env.LLM_MODEL || 'deepseek-chat'
+  const model = config?.model || process.env.LLM_MODEL || 'deepseek-flash'
 
   if (!baseUrl || !apiKey) return heuristicEnrich(info)
 
