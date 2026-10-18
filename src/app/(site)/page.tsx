@@ -60,11 +60,12 @@ export default async function HomePage() {
   const featured = data.featured.length ? data.featured : data.trending.slice(0, 4)
   const featuredIds = new Set(featured.map((item: any) => item.id))
   const picks = data.picks.filter((item: any) => !featuredIds.has(item.id))
-  const editorPicks = picks.length >= 8 ? picks.slice(0, 8) : picks.slice(0, 4)
+  const editorPicks = picks.slice(0, 8)
+  const pickCount = editorPicks.length
   const pickColumns =
-    editorPicks.length >= 4
+    pickCount === 4 || pickCount >= 7
       ? 'lg:grid-cols-4'
-      : editorPicks.length === 3
+      : pickCount >= 3
         ? 'lg:grid-cols-3'
         : 'lg:grid-cols-2'
   const hasContent = featured.length > 0 || data.latest.length > 0
