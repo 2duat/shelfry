@@ -501,3 +501,252 @@ html[data-theme='dark'] .os-import__msg--warn {
 html[data-theme='dark'] .os-import__msg--error {
   color: #ff6961;
 }
+
+
+/* ---------- 仪表盘数据概览 ---------- */
+.os-stats {
+  margin-bottom: 28px;
+}
+
+.os-stats__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.os-stats__title {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--theme-elevation-1000);
+}
+
+.os-stats__sub {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--theme-elevation-450);
+}
+
+.os-stats__alert {
+  color: #d92d20;
+}
+
+html[data-theme='dark'] .os-stats__alert {
+  color: #ff6961;
+}
+
+.os-stats__muted {
+  font-size: 12px;
+  color: var(--theme-elevation-450);
+}
+
+.os-stats__refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 8px;
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-700);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.os-stats__refresh:hover {
+  border-color: var(--os-accent);
+  color: var(--os-accent);
+}
+
+.os-spin {
+  animation: os-spin 1s linear infinite;
+}
+
+@keyframes os-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.os-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 1200px) {
+  .os-stats__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .os-stats__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.os-stat {
+  padding: 14px 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 14px;
+  background: var(--theme-elevation-0);
+}
+
+.os-stat__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--theme-elevation-450);
+}
+
+.os-stat__value {
+  margin-top: 7px;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--theme-elevation-1000);
+  font-variant-numeric: tabular-nums;
+}
+
+.os-stat__hint {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--theme-elevation-400);
+}
+
+.os-stats__panels {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 0.85fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 1100px) {
+  .os-stats__panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+.os-panel {
+  padding: 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 14px;
+  background: var(--theme-elevation-0);
+}
+
+.os-panel__title {
+  margin-bottom: 14px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--theme-elevation-450);
+}
+
+.os-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 96px;
+}
+
+.os-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 4px;
+}
+
+.os-bar__count {
+  font-size: 10px;
+  color: var(--theme-elevation-500);
+  font-variant-numeric: tabular-nums;
+}
+
+.os-bar__fill {
+  width: 100%;
+  max-width: 34px;
+  border-radius: 5px 5px 3px 3px;
+  background: linear-gradient(
+    180deg,
+    var(--os-accent),
+    color-mix(in srgb, var(--os-accent) 55%, transparent)
+  );
+}
+
+.os-bar__label {
+  font-size: 10px;
+  color: var(--theme-elevation-400);
+}
+
+.os-cats {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.os-cat {
+  display: grid;
+  grid-template-columns: 74px 1fr 30px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.os-cat__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--theme-elevation-700);
+}
+
+.os-cat__track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--theme-elevation-100);
+  overflow: hidden;
+}
+
+.os-cat__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--os-accent);
+}
+
+.os-cat__count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--theme-elevation-450);
+  font-variant-numeric: tabular-nums;
+}
+
+.os-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.os-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--theme-elevation-100);
+  font-size: 11.5px;
+  color: var(--theme-elevation-700);
+}
+
+.os-platform strong {
+  font-weight: 650;
+  color: var(--theme-elevation-1000);
+}

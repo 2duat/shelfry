@@ -27,6 +27,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      beforeDashboard: ['/components/admin/StatsPanel#StatsPanel'],
       beforeNavLinks: ['/components/admin/NavHeader#NavHeader'],
       graphics: {
         Logo: '/components/admin/Brand#Logo',
