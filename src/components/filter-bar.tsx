@@ -1,5 +1,6 @@
 'use client'
 
+import { Loader2 } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 
@@ -28,10 +29,13 @@ export function FilterBar({ hideKind = false }: { hideKind?: boolean }) {
     stars: searchParams.get('stars') || 'all',
   }
   const [filters, setFilters] = useState(base)
+  const searchKey = searchParams.toString()
 
   useEffect(() => {
-    if (!isPending) setFilters(base)
-  }, [isPending, searchParams])
+    setFilters(base)
+    // 只在 URL 真正变化时同步，避免乐观更新被立刻覆盖
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchKey])
 
   const setParam = useCallback(
     (key: keyof typeof base, value: string) => {
@@ -43,8 +47,9 @@ export function FilterBar({ hideKind = false }: { hideKind?: boolean }) {
       next.delete('page')
       const query = next.toString()
 
+      // 先立即更新选中态，再让路由在后台加载
+      setFilters((prev) => ({ ...prev, [key]: value }))
       startTransition(() => {
-        setFilters((prev) => ({ ...prev, [key]: value }))
         router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
       })
     },
@@ -56,7 +61,7 @@ export function FilterBar({ hideKind = false }: { hideKind?: boolean }) {
   return (
     <div
       aria-busy={isPending}
-      className={`rounded-[16px] border border-line bg-surface p-2.5 transition-opacity ${isPending ? 'pointer-events-none opacity-60' : ''}`}
+      className={`rounded-[16px] border border-line bg-surface p-2.5 transition-opacity ${isPending ? 'pointer-events-none opacity-80' : ''}`}
     >
       <div className="flex flex-wrap items-center gap-1.5">
         <FilterChip active={platform === 'all'} onClick={() => setParam('platform', 'all')}>
@@ -113,6 +118,16 @@ export function FilterBar({ hideKind = false }: { hideKind?: boolean }) {
             </option>
           ))}
         </select>
+
+        {isPending ? (
+          <span
+            aria-live="polite"
+            className="ml-auto inline-flex items-center gap-1.5 px-1 text-[11.5px] text-muted"
+          >
+            <Loader2 size={12} className="animate-spin" />
+            加载中
+          </span>
+        ) : null}
       </div>
 
       {!hideKind ? (

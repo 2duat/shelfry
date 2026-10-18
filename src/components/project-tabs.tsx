@@ -20,8 +20,8 @@ export function ProjectTabs({
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
-    if (!isPending) setActive(current)
-  }, [current, isPending])
+    setActive(current)
+  }, [current])
 
   const tabs: Array<{ value: TabValue; label: string; count: number }> = [
     { value: 'all', label: '全部', count: counts.all },
@@ -38,8 +38,9 @@ export function ProjectTabs({
     else next.set('pick', value)
     const query = next.toString()
 
+    // 先立即更新高亮，再让路由在后台加载
+    setActive(value)
     startTransition(() => {
-      setActive(value)
       router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
     })
   }
