@@ -10,7 +10,9 @@ export const publishedOrAuthenticated: Access = ({ req }) => {
   return { status: { equals: 'published' } }
 }
 
-export const adminOnly: Access = ({ req }) => {
+export const isAdmin = ({ req }: { req: { user?: unknown } }): boolean => {
   const user = req.user as { role?: string } | null
   return user?.role === 'admin'
 }
+
+export const adminOnly: Access = isAdmin

@@ -17,6 +17,12 @@ import { Tags } from './collections/Tags'
 import { Users } from './collections/Users'
 import { Settings } from './globals/Settings'
 
+const payloadSecret = process.env.PAYLOAD_SECRET
+
+if (!payloadSecret && process.env.NODE_ENV === 'production') {
+  throw new Error('PAYLOAD_SECRET is required in production')
+}
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -41,7 +47,7 @@ export default buildConfig({
   collections: [Items, Categories, Tags, CuratedLists, Submissions, SyncRuns, Media, Users],
   globals: [Settings],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || 'dev-only-secret',
+  secret: payloadSecret || 'dev-only-secret',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

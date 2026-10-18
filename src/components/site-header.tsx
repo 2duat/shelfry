@@ -20,7 +20,7 @@ const NAV = [
   { href: '/collections', label: '合集' },
 ]
 
-export function SiteHeader({ githubUrl }: { githubUrl?: string }) {
+export function SiteHeader({ siteName = 'Shelfry', githubUrl }: { siteName?: string; githubUrl?: string }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -31,11 +31,11 @@ export function SiteHeader({ githubUrl }: { githubUrl?: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line glass">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5 md:px-8">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Shelfry 首页">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={`${siteName} 首页`}>
           <span className="grid size-8 place-items-center rounded-[9px] bg-gradient-to-br from-[#3b82f6] to-[#6366f1] text-white shadow-sm">
             <Layers3 size={17} strokeWidth={2.2} />
           </span>
-          <span className="text-[15px] font-semibold tracking-[-0.01em]">Shelfry</span>
+          <span className="text-[15px] font-semibold tracking-[-0.01em]">{siteName}</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -60,15 +60,17 @@ export function SiteHeader({ githubUrl }: { githubUrl?: string }) {
 
         <div className="ml-auto flex items-center gap-2">
           <SearchButton />
-          <Link
-            href={githubUrl || 'https://github.com'}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub"
-            className="hidden size-9 place-items-center rounded-full border border-line bg-surface/60 text-muted transition hover:text-ink sm:grid"
-          >
-            <GithubIcon size={16} />
-          </Link>
+          {githubUrl ? (
+            <Link
+              href={githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+              className="hidden size-9 place-items-center rounded-full border border-line bg-surface/60 text-muted transition hover:text-ink sm:grid"
+            >
+              <GithubIcon size={16} />
+            </Link>
+          ) : null}
           <ThemeToggle />
           <button
             type="button"

@@ -1,3 +1,5 @@
+import { cache } from 'react'
+
 import { getPayloadClient } from './payload'
 
 export type ListParams = {
@@ -13,6 +15,22 @@ export type ListParams = {
   page?: number
   limit?: number
 }
+
+const CARD_SELECT = {
+  name: true,
+  slug: true,
+  tagline: true,
+  summary: true,
+  kind: true,
+  language: true,
+  platforms: true,
+  pricing: true,
+  stars: true,
+  iconUrl: true,
+  score: true,
+  publishedAt: true,
+  createdAt: true,
+} as const
 
 const SORT_MAP: Record<string, string> = {
   recommended: '-score',
@@ -63,8 +81,9 @@ export async function listItems(params: ListParams = {}) {
       where: buildWhere(params, categoryId),
       sort: SORT_MAP[params.sort || 'recommended'] ?? SORT_MAP.recommended,
       page: Math.max(1, params.page || 1),
-      limit: params.limit || 24,
+      limit: Math.min(60, Math.max(1, params.limit || 24)),
       depth: 1,
+      select: CARD_SELECT,
     })
 
     return result as any
@@ -78,7 +97,7 @@ function emptyPage() {
   return { docs: [], totalDocs: 0, totalPages: 0, page: 1, hasNextPage: false, hasPrevPage: false }
 }
 
-export async function getItemBySlug(slug: string) {
+export const getItemBySlug = cache(async (slug: string) => {
   try {
     const payload = await getPayloadClient()
     const result = await payload.find({
@@ -92,7 +111,7 @@ export async function getItemBySlug(slug: string) {
     console.error('[queries] getItemBySlug failed', error)
     return null
   }
-}
+})
 
 export async function getRelatedItems(item: any, limit = 3) {
   try {
@@ -104,7 +123,14 @@ export async function getRelatedItems(item: any, limit = 3) {
     }
     if (categoryId) where.category = { equals: categoryId }
 
-    let result = await payload.find({ collection: 'items', where, limit, depth: 1, sort: '-score' })
+    let result = await payload.find({
+      collection: 'items',
+      where,
+      limit,
+      depth: 1,
+      sort: '-score',
+      select: CARD_SELECT,
+    })
     if (result.docs.length === 0) {
       result = await payload.find({
         collection: 'items',
@@ -112,6 +138,7 @@ export async function getRelatedItems(item: any, limit = 3) {
         limit,
         depth: 1,
         sort: '-score',
+        select: CARD_SELECT,
       })
     }
     return result.docs as any[]
@@ -158,7 +185,8 @@ export async function getCollections(limit = 6) {
       where: { status: { equals: 'published' } },
       sort: 'sort',
       limit,
-      depth: 1,
+      depth: 0,
+      select: { title: true, slug: true, intro: true, cover: true, entries: true, updatedAt: true },
     })
     return result.docs as any[]
   } catch {
@@ -193,7 +221,7 @@ export async function getHomeData() {
       categories: [],
       tags: [],
       collections: [],
-      stats: { items: 0, stars: 0, categories: 0 },
+      stats: { items: 0, categories: 0 },
     }
   }
 
@@ -207,7 +235,6 @@ export async function getHomeData() {
       tags,
       collections,
       totalItems,
-      totalStars,
     ] = await Promise.all([
         payload.find({
           collection: 'items',
@@ -215,6 +242,7 @@ export async function getHomeData() {
           sort: '-score',
           limit: 4,
           depth: 1,
+          select: CARD_SELECT,
         }),
         payload.find({
           collection: 'items',
@@ -222,6 +250,7 @@ export async function getHomeData() {
           sort: '-publishedAt',
           limit: 8,
           depth: 1,
+          select: CARD_SELECT,
         }),
         payload.find({
           collection: 'items',
@@ -229,6 +258,7 @@ export async function getHomeData() {
           sort: '-score',
           limit: 6,
           depth: 1,
+          select: CARD_SELECT,
         }),
         payload.find({
           collection: 'items',
@@ -236,6 +266,7 @@ export async function getHomeData() {
           sort: '-publishedAt',
           limit: 6,
           depth: 1,
+          select: CARD_SELECT,
         }),
         payload.find({ collection: 'categories', limit: 12, sort: 'sort', depth: 0 }),
         payload.find({ collection: 'tags', limit: 14, sort: 'name', depth: 0 }),
@@ -244,10 +275,10 @@ export async function getHomeData() {
           where: { status: { equals: 'published' } },
           sort: 'sort',
           limit: 3,
-          depth: 1,
+          depth: 0,
+          select: { title: true, slug: true, intro: true, cover: true, entries: true, updatedAt: true },
         }),
         payload.count({ collection: 'items', where: { status: { equals: 'published' } } }),
-        payload.find({ collection: 'items', where: { status: { equals: 'published' } }, limit: 0 }),
       ])
 
     return {
@@ -261,7 +292,6 @@ export async function getHomeData() {
       collections: collections.docs as any[],
       stats: {
         items: totalItems.totalDocs,
-        stars: totalStars.docs?.length || totalItems.totalDocs,
         categories: categories.docs.length,
       },
     }
@@ -276,12 +306,12 @@ export async function getHomeData() {
       categories: [],
       tags: [],
       collections: [],
-      stats: { items: 0, stars: 0, categories: 0 },
+      stats: { items: 0, categories: 0 },
     }
   }
 }
 
-export async function getPublicSettings() {
+export const getPublicSettings = cache(async () => {
   try {
     const payload = await getPayloadClient()
     const settings = await payload.findGlobal({
@@ -293,7 +323,7 @@ export async function getPublicSettings() {
   } catch {
     return {} as any
   }
-}
+})
 
 export async function getAllItemSlugs() {
   try {

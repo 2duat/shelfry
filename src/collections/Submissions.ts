@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { anyone, authenticated } from './access'
+import { authenticated } from './access'
 
 export const Submissions: CollectionConfig = {
   slug: 'submissions',
@@ -12,7 +12,7 @@ export const Submissions: CollectionConfig = {
   },
   access: {
     read: authenticated,
-    create: anyone,
+    create: () => false,
     update: authenticated,
     delete: authenticated,
   },

@@ -1,5 +1,12 @@
-import type { CollectionConfig } from 'payload'
-import { authenticated } from './access'
+import type { Access, CollectionConfig } from 'payload'
+import { adminOnly, authenticated, isAdmin } from './access'
+
+const canCreateUser: Access = async ({ req }) => {
+  if (isAdmin({ req })) return true
+  // 首次部署允许创建第一个管理员
+  const count = await req.payload.count({ collection: 'users', overrideAccess: true })
+  return count.totalDocs === 0
+}
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -12,9 +19,9 @@ export const Users: CollectionConfig = {
   },
   access: {
     read: authenticated,
-    create: authenticated,
-    update: authenticated,
-    delete: authenticated,
+    create: canCreateUser,
+    update: adminOnly,
+    delete: adminOnly,
   },
   fields: [
     { name: 'name', label: '昵称', type: 'text' },

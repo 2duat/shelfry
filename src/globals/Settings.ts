@@ -1,14 +1,27 @@
+import { revalidatePath } from 'next/cache'
 import type { GlobalConfig } from 'payload'
-import { anyone, authenticated } from '../collections/access'
+import { adminOnly, anyone, isAdmin } from '../collections/access'
 
-const adminRead = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
+const adminRead = isAdmin
 
 export const Settings: GlobalConfig = {
   slug: 'settings',
   label: '站点设置',
   access: {
     read: anyone,
-    update: authenticated,
+    update: adminOnly,
+  },
+  hooks: {
+    afterChange: [
+      ({ doc }) => {
+        try {
+          revalidatePath('/', 'layout')
+        } catch {
+          /* 构建阶段忽略 */
+        }
+        return doc
+      },
+    ],
   },
   fields: [
     {
@@ -43,7 +56,7 @@ export const Settings: GlobalConfig = {
               type: 'text',
               access: { read: adminRead },
               admin: {
-                description: '只读 Token 即可，不填每天只能请求 60 次。保存后重启服务生效。',
+                description: '只读 Token 即可；环境变量 GITHUB_TOKEN 优先，留空则每天只有 60 次额度。',
               },
             },
             {
@@ -51,7 +64,7 @@ export const Settings: GlobalConfig = {
               label: 'LLM 接口地址',
               type: 'text',
               access: { read: adminRead },
-              admin: { description: '例如 https://api.deepseek.com/v1' },
+              admin: { description: '例如 https://api.deepseek.com/v1；环境变量 LLM_BASE_URL 优先' },
             },
             {
               name: 'llmApiKey',

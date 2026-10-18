@@ -18,7 +18,7 @@ export default async function SearchPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const sp = await searchParams
-  const query = typeof sp.q === 'string' ? sp.q.trim() : ''
+  const query = typeof sp.q === 'string' ? sp.q.trim().slice(0, 80) : ''
   const result = query ? await listItems({ q: query, limit: 30 }) : { docs: [], totalDocs: 0 }
 
   return (

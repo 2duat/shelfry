@@ -1,6 +1,8 @@
+import { revalidatePath } from 'next/cache'
 import type { CollectionConfig } from 'payload'
 import { enrichWithAI } from '../lib/ai'
 import { resolveCategoryId } from '../lib/category'
+import { getIntegrationConfig } from '../lib/integrations'
 import { fetchRepoInfo } from '../lib/github'
 import { computeScore } from '../lib/score'
 import { slugify } from '../lib/slug'
@@ -63,18 +65,23 @@ export const Items: CollectionConfig = {
           data.slug = slugify(repoName || current.name || 'item')
         }
 
+        const repoUrlChanged =
+          typeof data.repoUrl === 'string' && data.repoUrl !== originalDoc?.repoUrl
+
         const shouldFetch =
           Boolean(current.repoUrl) &&
           !(req.context as any)?.skipGithub &&
-          (operation === 'create' ||
-            data.repoUrl !== originalDoc?.repoUrl ||
-            Boolean(data.syncNow))
+          (operation === 'create' || repoUrlChanged || Boolean(data.syncNow))
 
-        if (!shouldFetch) return data
+        if (!shouldFetch) {
+          if (data.syncNow) data.syncNow = false
+          return data
+        }
 
         try {
-          const info = await fetchRepoInfo(String(current.repoUrl))
-          const enrich = await enrichWithAI(info)
+          const integration = await getIntegrationConfig(req.payload as any)
+          const info = await fetchRepoInfo(String(current.repoUrl), integration.githubToken)
+          const enrich = await enrichWithAI(info, integration)
 
           const existing = await req.payload.find({
             collection: 'items',
@@ -182,11 +189,23 @@ export const Items: CollectionConfig = {
     afterChange: [
       async ({ doc, req }) => {
         if ((req.context as any)?.skipTagSync) return doc
+
         try {
           await syncItemTags(req.payload as any, doc, req)
         } catch (error) {
           req.payload.logger.warn(`[items] 标签同步失败: ${String(error)}`)
         }
+
+        try {
+          revalidatePath('/')
+          revalidatePath(`/p/${doc.slug}`)
+          for (const path of ['/macos', '/windows', '/ai', '/plugins', '/collections', '/search']) {
+            revalidatePath(path)
+          }
+        } catch {
+          /* 构建或种子阶段没有请求上下文，忽略 */
+        }
+
         return doc
       },
     ],
@@ -225,6 +244,7 @@ export const Items: CollectionConfig = {
       name: 'publishedAt',
       label: '发布时间',
       type: 'date',
+      index: true,
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
     },
     {
@@ -422,11 +442,11 @@ export const Items: CollectionConfig = {
               label: '仓库信息（自动抓取）',
               admin: { initCollapsed: true },
               fields: [
-                { name: 'githubFullName', label: 'owner/repo', type: 'text', index: true, admin: { readOnly: true } },
+                { name: 'githubFullName', label: 'owner/repo', type: 'text', index: true, unique: true, admin: { readOnly: true } },
                 {
                   type: 'row',
                   fields: [
-                    { name: 'stars', label: 'Stars', type: 'number', admin: { readOnly: true, width: '33%' } },
+                    { name: 'stars', label: 'Stars', type: 'number', index: true, admin: { readOnly: true, width: '33%' } },
                     { name: 'forks', label: 'Forks', type: 'number', admin: { readOnly: true, width: '33%' } },
                     { name: 'language', label: '主要语言', type: 'text', admin: { readOnly: true, width: '34%' } },
                   ],
@@ -468,7 +488,7 @@ export const Items: CollectionConfig = {
                 {
                   type: 'row',
                   fields: [
-                    { name: 'score', label: '排序分', type: 'number', admin: { readOnly: true, width: '50%' } },
+                    { name: 'score', label: '排序分', type: 'number', index: true, admin: { readOnly: true, width: '50%' } },
                     { name: 'clicks', label: '外链点击', type: 'number', defaultValue: 0, admin: { readOnly: true, width: '50%' } },
                   ],
                 },

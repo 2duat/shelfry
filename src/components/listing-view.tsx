@@ -26,7 +26,8 @@ export async function ListingView({
   searchParams: SearchParams
   emptyHint?: string
 }) {
-  const page = Math.max(1, Number(searchParams.page) || 1)
+  const rawPage = Number(searchParams.page)
+  const page = Number.isFinite(rawPage) ? Math.max(1, Math.trunc(rawPage)) : 1
   const platform =
     fixedPlatform || (typeof searchParams.platform === 'string' ? searchParams.platform : undefined)
   const kindParam = typeof searchParams.kind === 'string' ? searchParams.kind : undefined
@@ -34,7 +35,8 @@ export async function ListingView({
   const pricing = typeof searchParams.pricing === 'string' ? searchParams.pricing : undefined
   const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'recommended'
   const starsParam = typeof searchParams.stars === 'string' ? searchParams.stars : undefined
-  const minStars = starsParam ? Number(starsParam) : undefined
+  const parsedStars = starsParam ? Number(starsParam) : NaN
+  const minStars = Number.isFinite(parsedStars) ? parsedStars : undefined
 
   const result = await listItems({
     platform,

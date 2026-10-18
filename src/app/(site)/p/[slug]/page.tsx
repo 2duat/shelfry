@@ -89,7 +89,7 @@ export default async function ItemPage({ params }: Params) {
     <div className="mx-auto w-full max-w-6xl px-5 pb-10 pt-6 md:px-8">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
 
       <nav className="flex items-center gap-1.5 text-[12px] text-muted" aria-label="面包屑">

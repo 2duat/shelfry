@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server'
 import { enrichWithAI } from '@/lib/ai'
 import { fetchRepoInfo } from '@/lib/github'
 import { getPayloadClient } from '@/lib/payload'
+import { getIntegrationConfig } from '@/lib/integrations'
 import { slugify } from '@/lib/slug'
 
 const CATEGORIES = [
@@ -248,6 +249,7 @@ export async function POST(request: NextRequest) {
   }
 
   const payload = await getPayloadClient()
+  const integration = await getIntegrationConfig(payload as any)
   const createAny = payload.create.bind(payload) as any
   const stats = { admin: false, categories: 0, tags: 0, items: 0, collections: 0, failed: [] as string[] }
 
@@ -294,7 +296,7 @@ export async function POST(request: NextRequest) {
 
   for (const repo of REPOS) {
     try {
-      const info = await fetchRepoInfo(repo.url)
+      const info = await fetchRepoInfo(repo.url, integration.githubToken)
       const existing = await payload.find({
         collection: 'items',
         where: { githubFullName: { equals: info.fullName } },
@@ -324,7 +326,7 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      const enrich = await enrichWithAI(info)
+      const enrich = await enrichWithAI(info, integration)
       const platforms = repo.platforms || enrich.platforms
 
       const doc = await createAny({

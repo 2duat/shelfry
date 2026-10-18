@@ -22,17 +22,20 @@ export type RepoInfo = {
   htmlUrl: string
 }
 
-function headers(): Record<string, string> {
+function headers(token?: string): Record<string, string> {
   const h: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'Shelfry/1.0',
     'X-GitHub-Api-Version': '2022-11-28',
   }
-  if (process.env.GITHUB_TOKEN) {
-    h.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+  const auth = token || process.env.GITHUB_TOKEN
+  if (auth) {
+    h.Authorization = `Bearer ${auth}`
   }
   return h
 }
+
+const TIMEOUT_MS = 15_000
 
 export function parseRepoUrl(input: string): { owner: string; repo: string } | null {
   if (!input) return null
@@ -51,6 +54,7 @@ async function fetchReadme(owner: string, repo: string): Promise<string> {
       const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/HEAD/${file}`, {
         headers: { 'User-Agent': 'Shelfry/1.0' },
         cache: 'no-store',
+        signal: AbortSignal.timeout(TIMEOUT_MS),
       })
       if (res.ok) {
         const text = await res.text()
@@ -63,11 +67,12 @@ async function fetchReadme(owner: string, repo: string): Promise<string> {
   return ''
 }
 
-async function fetchLatestRelease(owner: string, repo: string): Promise<string> {
+async function fetchLatestRelease(owner: string, repo: string, token?: string): Promise<string> {
   try {
     const res = await fetch(`${API}/repos/${owner}/${repo}/releases/latest`, {
-      headers: headers(),
+      headers: headers(token),
       cache: 'no-store',
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     })
     if (!res.ok) return ''
     const data = (await res.json()) as { tag_name?: string; name?: string }
@@ -101,6 +106,7 @@ async function fetchRepoFromHtml(owner: string, repo: string): Promise<RepoInfo>
   const res = await fetch(`https://github.com/${owner}/${repo}`, {
     headers: { 'User-Agent': BROWSER_UA, Accept: 'text/html' },
     cache: 'no-store',
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   })
 
   if (!res.ok) {
@@ -157,14 +163,15 @@ async function fetchRepoFromHtml(owner: string, repo: string): Promise<RepoInfo>
   }
 }
 
-export async function fetchRepoInfo(input: string): Promise<RepoInfo> {
+export async function fetchRepoInfo(input: string, token?: string): Promise<RepoInfo> {
   const parsed = parseRepoUrl(input)
   if (!parsed) throw new Error('不是有效的 GitHub 仓库地址，例如 https://github.com/owner/repo')
 
   const { owner, repo } = parsed
   const res = await fetch(`${API}/repos/${owner}/${repo}`, {
-    headers: headers(),
+    headers: headers(token),
     cache: 'no-store',
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   })
 
   if (res.status === 404) throw new Error('仓库不存在，或已被设为私有')
@@ -193,7 +200,7 @@ export async function fetchRepoInfo(input: string): Promise<RepoInfo> {
 
   const [readme, latestRelease] = await Promise.all([
     fetchReadme(owner, repo),
-    fetchLatestRelease(owner, repo),
+    fetchLatestRelease(owner, repo, token),
   ])
 
   return {

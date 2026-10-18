@@ -8,8 +8,25 @@ const WINDOW_MS = 60 * 60 * 1000
 const LIMIT = 8
 const hits = new Map<string, { count: number; startedAt: number }>()
 
+function clientIp(request: NextRequest): string {
+  // Nginx 的 $remote_addr 会写入 X-Real-IP，且客户端无法伪造
+  const realIp = request.headers.get('x-real-ip')
+  if (realIp) return realIp
+  // 没经过反代时，X-Forwarded-For 的最后一段才是直连地址
+  const forwarded = request.headers.get('x-forwarded-for')
+  if (forwarded) return forwarded.split(',').pop()?.trim() || 'local'
+  return 'local'
+}
+
 function rateLimited(key: string): boolean {
   const now = Date.now()
+
+  if (hits.size > 5000) {
+    for (const [ip, entry] of hits) {
+      if (now - entry.startedAt > WINDOW_MS) hits.delete(ip)
+    }
+  }
+
   const entry = hits.get(key)
   if (!entry || now - entry.startedAt > WINDOW_MS) {
     hits.set(key, { count: 1, startedAt: now })
@@ -20,13 +37,13 @@ function rateLimited(key: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'local'
+  const ip = clientIp(request)
 
   if (rateLimited(ip)) {
-    return NextResponse.json({ error: '提交太频繁了，请一小时后再试' }, { status: 429 })
+    return NextResponse.json(
+      { error: '提交太频繁了，请一小时后再试' },
+      { status: 429, headers: { 'Retry-After': '3600' } },
+    )
   }
 
   let body: { repoUrl?: string; note?: string; contact?: string }

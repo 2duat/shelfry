@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server'
 import { enrichWithAI } from '@/lib/ai'
 import { resolveCategoryId } from '@/lib/category'
 import { fetchRepoInfo, inferKind, inferPlatforms, guessPricing } from '@/lib/github'
+import { getIntegrationConfig } from '@/lib/integrations'
 import { getPayloadClient } from '@/lib/payload'
 import { slugify } from '@/lib/slug'
 import { syncItemTags } from '@/lib/tags'
@@ -17,22 +18,22 @@ const DEFAULT_RULES = [
   { query: 'topic:mcp-server stars:>500 pushed:>2025-01-01', defaultKind: 'mcp-server' },
 ]
 
+let cronRunning = false
+
 function authorized(request: NextRequest): boolean {
   const secret = process.env.CRON_SECRET
   if (!secret) return false
-  return (
-    request.headers.get('x-cron-secret') === secret ||
-    request.nextUrl.searchParams.get('secret') === secret
-  )
+  return request.headers.get('x-cron-secret') === secret
 }
 
-function ghHeaders(): Record<string, string> {
+function ghHeaders(token?: string): Record<string, string> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'Shelfry/1.0',
     'X-GitHub-Api-Version': '2022-11-28',
   }
-  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+  const auth = token || process.env.GITHUB_TOKEN
+  if (auth) headers.Authorization = `Bearer ${auth}`
   return headers
 }
 
@@ -54,7 +55,7 @@ async function uniqueSlug(payload: any, base: string): Promise<string> {
   return `${root}-${Date.now().toString(36)}`
 }
 
-async function runRefresh(payload: any, limit: number) {
+async function runRefresh(payload: any, limit: number, integration: any) {
   const stats = { updated: 0, failed: 0 }
 
   const never = await payload.find({
@@ -79,7 +80,7 @@ async function runRefresh(payload: any, limit: number) {
   for (const item of docs) {
     try {
       if (!item.repoUrl) continue
-      const info = await fetchRepoInfo(item.repoUrl)
+      const info = await fetchRepoInfo(item.repoUrl, integration.githubToken)
       await payload.update({
         collection: 'items',
         id: item.id,
@@ -105,7 +106,7 @@ async function runRefresh(payload: any, limit: number) {
   return stats
 }
 
-async function runEnrich(payload: any, limit: number) {
+async function runEnrich(payload: any, limit: number, integration: any) {
   const stats = { enriched: 0, failed: 0 }
 
   const drafts = await payload.find({
@@ -119,9 +120,11 @@ async function runEnrich(payload: any, limit: number) {
   for (const item of drafts.docs) {
     if (!item.repoUrl) continue
     if (item.tagline && item.summary && item.aiMeta?.enrichedAt) continue
+    const lastAttempt = item.aiMeta?.lastAttemptAt ? new Date(item.aiMeta.lastAttemptAt).getTime() : 0
+    if (lastAttempt && Date.now() - lastAttempt < 24 * 60 * 60 * 1000) continue
     try {
-      const info = await fetchRepoInfo(item.repoUrl)
-      const enrichment = await enrichWithAI(info)
+      const info = await fetchRepoInfo(item.repoUrl, integration.githubToken)
+      const enrichment = await enrichWithAI(info, integration)
       const categoryId = item.category
         ? undefined
         : await resolveCategoryId(payload, enrichment.categoryHint, enrichment.kind || item.kind)
@@ -164,13 +167,30 @@ async function runEnrich(payload: any, limit: number) {
     } catch (error) {
       stats.failed += 1
       console.error('[cron:enrich] failed', item.slug, String(error))
+      try {
+        await payload.update({
+          collection: 'items',
+          id: item.id,
+          overrideAccess: true,
+          context: { skipGithub: true, skipTagSync: true },
+          data: {
+            aiMeta: {
+              ...(item.aiMeta || {}),
+              lastAttemptAt: new Date().toISOString(),
+              lastError: String(error).slice(0, 300),
+            },
+          },
+        })
+      } catch {
+        /* 记录失败不影响本轮其他条目 */
+      }
     }
   }
 
   return stats
 }
 
-async function runDiscover(payload: any, perRule = 8) {
+async function runDiscover(payload: any, integration: any, perRule = 8) {
   const stats = { found: 0, created: 0, skipped: 0, rules: 0 }
 
   const settings = await payload.findGlobal({ slug: 'settings', depth: 0, overrideAccess: true })
@@ -189,7 +209,7 @@ async function runDiscover(payload: any, perRule = 8) {
         `https://api.github.com/search/repositories?q=${encodeURIComponent(
           rule.query,
         )}&sort=stars&order=desc&per_page=${perRule}`,
-        { headers: ghHeaders(), cache: 'no-store' },
+        { headers: ghHeaders(integration.githubToken), cache: 'no-store' },
       )
       if (!response.ok) continue
       const data = (await response.json()) as { items?: any[] }
@@ -262,7 +282,7 @@ async function runDiscover(payload: any, perRule = 8) {
 }
 
 
-async function runReadme(payload: any, limit: number) {
+async function runReadme(payload: any, limit: number, integration: any) {
   const stats = { filled: 0, failed: 0 }
 
   const docs = await payload.find({
@@ -275,7 +295,7 @@ async function runReadme(payload: any, limit: number) {
   for (const item of docs.docs) {
     if (!item.repoUrl) continue
     try {
-      const info = await fetchRepoInfo(item.repoUrl)
+      const info = await fetchRepoInfo(item.repoUrl, integration.githubToken)
       await payload.update({
         collection: 'items',
         id: item.id,
@@ -327,8 +347,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 
+  if (cronRunning) {
+    return NextResponse.json({ error: '上一个同步任务还在运行，请稍后重试' }, { status: 409 })
+  }
+
+  cronRunning = true
+
+  try {
   const task = request.nextUrl.searchParams.get('task') || 'refresh'
   const payload = await getPayloadClient()
+  const integration = await getIntegrationConfig(payload as any)
 
   const run = await payload.create({
     collection: 'sync-runs',
@@ -355,11 +383,11 @@ export async function GET(request: NextRequest) {
     const refreshLimit = Math.min(60, Number(settings?.refreshLimit) || 30)
 
     let stats: Record<string, number> = {}
-    if (task === 'discover') stats = await runDiscover(payload)
-    else if (task === 'enrich') stats = await runEnrich(payload, 6)
-    else if (task === 'readme') stats = await runReadme(payload, 20)
+    if (task === 'discover') stats = await runDiscover(payload, integration)
+    else if (task === 'enrich') stats = await runEnrich(payload, 6, integration)
+    else if (task === 'readme') stats = await runReadme(payload, 20, integration)
     else if (task === 'tags') stats = await runTags(payload, 40)
-    else stats = await runRefresh(payload, refreshLimit)
+    else stats = await runRefresh(payload, refreshLimit, integration)
 
     await payload.update({
       collection: 'sync-runs',
@@ -385,5 +413,8 @@ export async function GET(request: NextRequest) {
       },
     })
     return NextResponse.json({ ok: false, error: String(error) }, { status: 500 })
+  }
+  } finally {
+    cronRunning = false
   }
 }

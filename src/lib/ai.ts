@@ -1,4 +1,9 @@
+import { KINDS, PLATFORMS, PRICINGS } from './constants'
 import { inferKind, inferPlatforms, guessPricing, type RepoInfo } from './github'
+
+const KIND_VALUES = new Set<string>(KINDS.map((item) => item.value))
+const PLATFORM_VALUES = new Set<string>(PLATFORMS.map((item) => item.value))
+const PRICING_VALUES = new Set<string>(PRICINGS.map((item) => item.value))
 
 export type Enrichment = {
   tagline: string
@@ -127,10 +132,16 @@ const SYSTEM_PROMPT = `你是一个中文软件目录站的资深编辑。你会
 }
 只输出 JSON。`
 
-export async function enrichWithAI(info: RepoInfo): Promise<Enrichment> {
-  const baseUrl = process.env.LLM_BASE_URL
-  const apiKey = process.env.LLM_API_KEY
-  const model = process.env.LLM_MODEL || 'deepseek-chat'
+type AIConfig = {
+  baseUrl?: string
+  apiKey?: string
+  model?: string
+}
+
+export async function enrichWithAI(info: RepoInfo, config?: AIConfig): Promise<Enrichment> {
+  const baseUrl = config?.baseUrl || process.env.LLM_BASE_URL
+  const apiKey = config?.apiKey || process.env.LLM_API_KEY
+  const model = config?.model || process.env.LLM_MODEL || 'deepseek-chat'
 
   if (!baseUrl || !apiKey) return heuristicEnrich(info)
 
@@ -161,6 +172,7 @@ export async function enrichWithAI(info: RepoInfo): Promise<Enrichment> {
         ],
       }),
       cache: 'no-store',
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) return heuristicEnrich(info)
@@ -174,17 +186,36 @@ export async function enrichWithAI(info: RepoInfo): Promise<Enrichment> {
     const parsed = JSON.parse(raw) as Partial<Enrichment>
     const fallback = heuristicEnrich(info)
 
+    const kind = String(parsed.kind || '')
+    const pricing = String(parsed.pricing || '')
+    const platforms = Array.isArray(parsed.platforms)
+      ? [...new Set(parsed.platforms.map(String).filter((value) => PLATFORM_VALUES.has(value)))]
+      : []
+
     return {
-      tagline: parsed.tagline?.slice(0, 90) || fallback.tagline,
-      summary: parsed.summary?.slice(0, 400) || fallback.summary,
-      features: Array.isArray(parsed.features) ? parsed.features.slice(0, 6) : fallback.features,
-      audience: parsed.audience || '',
-      installHint: parsed.installHint || fallback.installHint,
-      categoryHint: parsed.categoryHint || '',
-      tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 5) : fallback.tags,
-      kind: parsed.kind || fallback.kind,
-      platforms: Array.isArray(parsed.platforms) ? parsed.platforms : fallback.platforms,
-      pricing: parsed.pricing || fallback.pricing,
+      tagline:
+        typeof parsed.tagline === 'string' && parsed.tagline.trim()
+          ? parsed.tagline.slice(0, 90)
+          : fallback.tagline,
+      summary:
+        typeof parsed.summary === 'string' && parsed.summary.trim()
+          ? parsed.summary.slice(0, 400)
+          : fallback.summary,
+      features: Array.isArray(parsed.features)
+        ? parsed.features.filter((item): item is string => typeof item === 'string').slice(0, 6)
+        : fallback.features,
+      audience: typeof parsed.audience === 'string' ? parsed.audience : '',
+      installHint:
+        typeof parsed.installHint === 'string' && parsed.installHint
+          ? parsed.installHint
+          : fallback.installHint,
+      categoryHint: typeof parsed.categoryHint === 'string' ? parsed.categoryHint : '',
+      tags: Array.isArray(parsed.tags)
+        ? parsed.tags.filter((item): item is string => typeof item === 'string').slice(0, 5)
+        : fallback.tags,
+      kind: KIND_VALUES.has(kind) ? kind : fallback.kind,
+      platforms: platforms.length ? platforms : fallback.platforms,
+      pricing: PRICING_VALUES.has(pricing) ? pricing : fallback.pricing,
       aiGenerated: true,
     }
   } catch {

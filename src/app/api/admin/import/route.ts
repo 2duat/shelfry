@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 
 import { enrichWithAI } from '@/lib/ai'
 import { resolveCategoryId } from '@/lib/category'
+import { getIntegrationConfig } from '@/lib/integrations'
 import { fetchRepoInfo, parseRepoUrl } from '@/lib/github'
 import { getPayloadClient } from '@/lib/payload'
 import { slugify } from '@/lib/slug'
@@ -52,7 +53,8 @@ export async function POST(request: NextRequest) {
   const status = body.status === 'published' ? 'published' : 'draft'
 
   try {
-    const info = await fetchRepoInfo(repoUrl)
+    const integration = await getIntegrationConfig(payload as any)
+    const info = await fetchRepoInfo(repoUrl, integration.githubToken)
 
     const existing = await payload.find({
       collection: 'items',
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const enrichment = await enrichWithAI(info)
+    const enrichment = await enrichWithAI(info, integration)
     const categoryId = await resolveCategoryId(payload as any, enrichment.categoryHint, enrichment.kind)
 
     const doc = await payload.create({

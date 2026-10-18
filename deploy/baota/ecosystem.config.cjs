@@ -11,7 +11,7 @@ module.exports = {
       args: 'start -H 127.0.0.1 -p 3000',
       instances: 1,
       exec_mode: 'fork',
-      max_memory_restart: '700M',
+      max_memory_restart: '900M',
       autorestart: true,
       env: {
         NODE_ENV: 'production',
