@@ -232,29 +232,24 @@ export default async function ItemPage({ params }: Params) {
 
           {readme ? (
             <section className="mt-10 first:mt-0">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted">
-                  项目 README
-                </h2>
-                {item.repoUrl ? (
-                  <a
-                    href={item.repoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[12px] text-muted transition hover:text-accent"
-                  >
-                    在 GitHub 打开 ↗
-                  </a>
-                ) : null}
-              </div>
-
               <div className="overflow-hidden rounded-[14px] border border-line bg-surface">
                 <div className="flex items-center gap-2 border-b border-line bg-surface-soft/60 px-4 py-2">
                   <span className="size-[7px] rounded-full bg-[#ff5f57]" />
                   <span className="size-[7px] rounded-full bg-[#febc2e]" />
                   <span className="size-[7px] rounded-full bg-[#28c840]" />
                   <span className="ml-2 font-mono text-[11.5px] text-muted">README.md</span>
-                  <span className="ml-auto text-[11px] text-muted">内容较长，可在框内滚动</span>
+                  {item.repoUrl ? (
+                    <a
+                      href={item.repoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-auto inline-flex items-center gap-1 text-[11.5px] text-accent transition hover:opacity-75"
+                    >
+                      在 GitHub 打开 <ArrowUpRight size={12} />
+                    </a>
+                  ) : (
+                    <span className="ml-auto text-[11px] text-muted">可在框内滚动</span>
+                  )}
                 </div>
                 <div className="relative">
                   <div className="readme-scroll h-[440px] overflow-y-auto overscroll-contain px-5 py-4 md:h-[560px] md:px-6">
