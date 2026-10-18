@@ -31,7 +31,7 @@ function cleanSegment(segment: string): string {
     .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_, text: string) => `\n## ${text.replace(/<[^>]+>/g, '').trim()}\n`)
     .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, (_, text: string) => `\n### ${text.replace(/<[^>]+>/g, '').trim()}\n`)
     .replace(/<p[^>]*align=["']center["'][^>]*>([\s\S]*?)<\/p>/gi, (_, inner: string) => {
-      return `\n${inner.replace(/<img\b/gi, '<img data-os-center="1"')}\n`
+      return `\n\n${inner.replace(/<img\b/gi, '<img data-os-center="1"')}\n\n`
     })
     .replace(/<img\b([^>]*?)\/?>/gi, (_, attrs: string) => {
       const src = getAttr(attrs, 'src')
@@ -50,7 +50,7 @@ function cleanSegment(segment: string): string {
           : center
             ? ` "os:x${flags}"`
             : ''
-      return `\n![${alt}](${decodeEntities(src)}${title})\n`
+      return ` ![${alt}](${decodeEntities(src)}${title}) `
     })
     .replace(
       /<a[^>]*?href=["']([^"']+)["'][^>]*?>([\s\S]*?)<\/a>/gi,
