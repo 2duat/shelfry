@@ -191,33 +191,43 @@ export async function getHomeData() {
       trending: [],
       latest: [],
       categories: [],
+      tags: [],
       collections: [],
       stats: { items: 0, stars: 0, categories: 0 },
     }
   }
 
   try {
-    const [featured, picks, trending, latest, categories, collections, totalItems, totalStars] =
-      await Promise.all([
+    const [
+      featured,
+      picks,
+      trending,
+      latest,
+      categories,
+      tags,
+      collections,
+      totalItems,
+      totalStars,
+    ] = await Promise.all([
         payload.find({
           collection: 'items',
           where: { status: { equals: 'published' }, featured: { equals: true } },
           sort: '-score',
-          limit: 6,
+          limit: 4,
           depth: 1,
         }),
         payload.find({
           collection: 'items',
           where: { status: { equals: 'published' }, editorsPick: { equals: true } },
           sort: '-publishedAt',
-          limit: 6,
+          limit: 8,
           depth: 1,
         }),
         payload.find({
           collection: 'items',
           where: { status: { equals: 'published' } },
           sort: '-score',
-          limit: 8,
+          limit: 6,
           depth: 1,
         }),
         payload.find({
@@ -228,6 +238,7 @@ export async function getHomeData() {
           depth: 1,
         }),
         payload.find({ collection: 'categories', limit: 12, sort: 'sort', depth: 0 }),
+        payload.find({ collection: 'tags', limit: 14, sort: 'name', depth: 0 }),
         payload.find({
           collection: 'curated-lists',
           where: { status: { equals: 'published' } },
@@ -246,6 +257,7 @@ export async function getHomeData() {
       trending: trending.docs as any[],
       latest: latest.docs as any[],
       categories: categories.docs as any[],
+      tags: tags.docs as any[],
       collections: collections.docs as any[],
       stats: {
         items: totalItems.totalDocs,
@@ -262,6 +274,7 @@ export async function getHomeData() {
       trending: [],
       latest: [],
       categories: [],
+      tags: [],
       collections: [],
       stats: { items: 0, stars: 0, categories: 0 },
     }
