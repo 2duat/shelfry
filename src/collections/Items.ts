@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { enrichWithAI } from '../lib/ai'
+import { resolveCategoryId } from '../lib/category'
 import { fetchRepoInfo } from '../lib/github'
 import { computeScore } from '../lib/score'
 import { slugify } from '../lib/slug'
@@ -109,6 +110,15 @@ export const Items: CollectionConfig = {
           data.installCommand = current.installCommand || enrich.installHint
           data.pricing = current.pricing || enrich.pricing
           data.kind = current.kind || enrich.kind
+          if (!current.category) {
+            const categoryId = await resolveCategoryId(
+              req.payload as any,
+              enrich.categoryHint,
+              String(data.kind || current.kind || 'app'),
+              req,
+            )
+            if (categoryId) data.category = categoryId as any
+          }
           data.platforms = asArray(current.platforms).length
             ? current.platforms
             : enrich.platforms.filter(Boolean)

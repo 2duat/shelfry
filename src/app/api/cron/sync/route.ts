@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 import { enrichWithAI } from '@/lib/ai'
+import { resolveCategoryId } from '@/lib/category'
 import { fetchRepoInfo, inferKind, inferPlatforms, guessPricing } from '@/lib/github'
 import { getPayloadClient } from '@/lib/payload'
 import { slugify } from '@/lib/slug'
@@ -121,6 +122,9 @@ async function runEnrich(payload: any, limit: number) {
     try {
       const info = await fetchRepoInfo(item.repoUrl)
       const enrichment = await enrichWithAI(info)
+      const categoryId = item.category
+        ? undefined
+        : await resolveCategoryId(payload, enrichment.categoryHint, enrichment.kind || item.kind)
 
       await payload.update({
         collection: 'items',
@@ -131,6 +135,7 @@ async function runEnrich(payload: any, limit: number) {
           tagline: item.tagline || enrichment.tagline,
           summary: item.summary || enrichment.summary,
           kind: item.kind || enrichment.kind,
+          ...(categoryId ? { category: categoryId } : {}),
           platforms: item.platforms?.length ? item.platforms : enrichment.platforms,
           tagsText: item.tagsText || enrichment.tags.join(', '),
           installCommand: item.installCommand || enrichment.installHint,
@@ -207,6 +212,8 @@ async function runDiscover(payload: any, perRule = 8) {
           Boolean(settings?.autoPublish) &&
           Number(repo.stargazers_count || 0) >= Number(settings?.autoPublishStars || 800)
 
+        const categoryId = await resolveCategoryId(payload, '', rule.defaultKind || 'app')
+
         const infoLike = {
           name: repo.name,
           description: repo.description || '',
@@ -227,6 +234,7 @@ async function runDiscover(payload: any, perRule = 8) {
             tagline: repo.description || '',
             summary: repo.description || '',
             kind: rule.defaultKind || inferKind(infoLike as any),
+            category: categoryId,
             platforms: inferPlatforms(infoLike as any),
             pricing: guessPricing({ license: repo.license?.spdx_id } as any),
             license: repo.license?.spdx_id || '',

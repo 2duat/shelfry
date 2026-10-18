@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 import { enrichWithAI } from '@/lib/ai'
+import { resolveCategoryId } from '@/lib/category'
 import { fetchRepoInfo, parseRepoUrl } from '@/lib/github'
 import { getPayloadClient } from '@/lib/payload'
 import { slugify } from '@/lib/slug'
@@ -76,6 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     const enrichment = await enrichWithAI(info)
+    const categoryId = await resolveCategoryId(payload as any, enrichment.categoryHint, enrichment.kind)
 
     const doc = await payload.create({
       collection: 'items',
@@ -90,6 +92,7 @@ export async function POST(request: NextRequest) {
         tagline: enrichment.tagline,
         summary: enrichment.summary,
         kind: enrichment.kind,
+        category: categoryId,
         platforms: enrichment.platforms,
         pricing: enrichment.pricing || 'open-source',
         license: info.license,
