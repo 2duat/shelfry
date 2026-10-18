@@ -1,0 +1,11 @@
+# 宝塔 → 计划任务 → Shell 脚本，把下面命令分别建三条
+# 记得把 CRON_SECRET 换成你 .env 里的值
+
+# 1) 每 10 分钟：刷新已发布条目的星标 / 最后提交 / 版本
+*/10 * * * * curl -s -m 120 -H "x-cron-secret: 你的CRON_SECRET" "http://127.0.0.1:3000/api/cron/sync?task=refresh" >/dev/null 2>&1
+
+# 2) 每 30 分钟：给草稿补全中文介绍、标签、封面
+*/30 * * * * curl -s -m 180 -H "x-cron-secret: 你的CRON_SECRET" "http://127.0.0.1:3000/api/cron/sync?task=enrich" >/dev/null 2>&1
+
+# 3) 每 6 小时：按规则从 GitHub 搜索发现新项目（进草稿箱）
+0 */6 * * * curl -s -m 180 -H "x-cron-secret: 你的CRON_SECRET" "http://127.0.0.1:3000/api/cron/sync?task=discover" >/dev/null 2>&1
