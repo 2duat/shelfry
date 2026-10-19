@@ -214,10 +214,137 @@ body {
 
 /* ---------- 顶部栏 ---------- */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   border-bottom: 1px solid var(--theme-border-color);
   background: color-mix(in srgb, var(--theme-bg) 82%, transparent);
   backdrop-filter: saturate(180%) blur(16px);
   -webkit-backdrop-filter: saturate(180%) blur(16px);
+}
+
+/* ---------- 列表页主视觉 ---------- */
+.list-header {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 2px 0 0;
+  padding: 28px 30px 26px;
+  border-radius: 20px;
+  color: #fff;
+  background:
+    radial-gradient(520px 260px at 92% -10%, rgba(56, 189, 248, 0.5), transparent 65%),
+    radial-gradient(420px 260px at 8% 120%, rgba(99, 102, 241, 0.42), transparent 70%),
+    linear-gradient(135deg, #0b1220 0%, #102a4c 55%, #0a4f8f 100%);
+  box-shadow: 0 20px 44px -30px rgba(2, 20, 45, 0.9);
+}
+
+.list-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(135deg, #000 0%, transparent 68%);
+  -webkit-mask-image: linear-gradient(135deg, #000 0%, transparent 68%);
+}
+
+.list-header__content {
+  position: relative;
+  z-index: 1;
+}
+
+.list-header__title-and-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-right: 180px;
+}
+
+.list-header__title {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(30px, 3.4vw, 42px);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+.list-header__title::before {
+  content: 'SHELFRY · 内容管理';
+  display: block;
+  margin-bottom: 9px;
+  color: rgba(186, 222, 255, 0.82);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+}
+
+.list-header__title-actions {
+  position: absolute;
+  top: 28px;
+  right: 30px;
+  z-index: 3;
+  margin: 0;
+}
+
+.list-create-new-doc__create-new-button {
+  height: 34px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: #0b1220;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.55);
+}
+
+.list-create-new-doc__create-new-button:hover {
+  background: #eaf5ff;
+  color: #0b1220;
+}
+
+.list-header__actions:empty {
+  display: none;
+}
+
+.list-header__after-header-content {
+  margin-top: 12px;
+}
+
+.list-header .custom-view-description {
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.list-header .collection-list__sub-header {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .list-header {
+    padding: 22px 20px;
+    border-radius: 16px;
+  }
+
+  .list-header__title-and-actions {
+    flex-direction: column;
+    gap: 14px;
+    padding-right: 0;
+  }
+
+  .list-header__title-actions {
+    position: static;
+  }
 }
 
 /* ---------- 仪表盘 ---------- */
@@ -875,7 +1002,16 @@ html[data-theme='dark'] .os-stats__alert {
   margin-bottom: 0;
 }
 
+.collection-list__wrap > .collection-list__wrap > .list-controls {
+  border-radius: 16px 16px 0 0;
+}
+
 .collection-list__wrap > .shelfry-admin-list-tools {
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 16px 30px -28px rgba(0, 0, 0, 0.5);
+}
+
+.shelfry-admin-list-tools {
   margin-bottom: 14px;
 }
 
@@ -937,9 +1073,10 @@ html[data-theme='dark'] .os-stats__alert {
 }
 
 .shelfry-admin-tab.is-active {
-  background: var(--theme-text);
-  border-color: var(--theme-text);
-  color: var(--theme-bg);
+  background: linear-gradient(135deg, #0071e3, #4f46e5);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 16px -10px rgba(0, 113, 227, 0.8);
 }
 
 .shelfry-admin-tab__count {
@@ -1173,6 +1310,6 @@ html[data-theme='dark'] .os-stats__alert {
 
 @media (max-width: 768px) {
   .collection-list__wrap > .shelfry-admin-list-tools {
-    top: 46px;
+    top: calc(var(--app-header-height) + 46px);
   }
 }
