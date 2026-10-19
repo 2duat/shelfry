@@ -1019,3 +1019,17 @@ html[data-theme='dark'] .os-stats__alert {
     margin-left: 0;
   }
 }
+
+
+.shelfry-enrich-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+}
+
+.shelfry-enrich-action .shelfry-admin-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
