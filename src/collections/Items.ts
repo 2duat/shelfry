@@ -39,6 +39,7 @@ export const Items: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     group: '内容',
+    enableListViewSelectAPI: true,
     defaultColumns: ['name', 'kind', 'status', 'stars', 'updatedAt'],
     listSearchableFields: ['name', 'githubFullName', 'tagline', 'tagsText'],
     components: {

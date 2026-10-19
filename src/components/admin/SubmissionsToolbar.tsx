@@ -1,9 +1,10 @@
 'use client'
 
 import { useSelection } from '@payloadcms/ui'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 
 type Counts = {
   submissions: { all: number; pending: number; approved: number; rejected: number }
@@ -19,6 +20,14 @@ export function SubmissionsToolbar() {
   const [counts, setCounts] = useState<Counts | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [isPending, startTransition] = useTransition()
+
+  const currentStatus = searchParams.get('where[status][equals]') || 'all'
+  const [active, setActive] = useState(currentStatus)
+
+  useEffect(() => {
+    setActive(currentStatus)
+  }, [currentStatus])
 
   const loadCounts = useCallback(async () => {
     try {
@@ -33,7 +42,7 @@ export function SubmissionsToolbar() {
     void loadCounts()
   }, [loadCounts])
 
-  const currentStatus = searchParams.get('where[status][equals]')
+  const itemsBase = pathname.replace(/\/submissions\/?$/, '/items')
   const tabs = [
     { key: 'all', label: '全部', href: pathname, count: counts?.submissions.all },
     {
@@ -55,6 +64,12 @@ export function SubmissionsToolbar() {
       count: counts?.submissions.rejected,
     },
   ]
+
+  const go = (key: string, href: string) => {
+    if (isPending || key === active) return
+    setActive(key)
+    startTransition(() => router.push(href, { scroll: false }))
+  }
 
   const applyStatus = async (status: 'approved' | 'rejected') => {
     if (!count || busy) return
@@ -90,29 +105,31 @@ export function SubmissionsToolbar() {
 
   return (
     <div className="shelfry-admin-list-tools">
+      <Link href={itemsBase} className="shelfry-admin-back">
+        <ArrowLeft size={13} />
+        软件条目
+      </Link>
+
       <nav className="shelfry-admin-tabs" aria-label="投稿状态">
-        {tabs.map((tab) => {
-          const active =
-            tab.key === 'all' ? !currentStatus : currentStatus === tab.key
-          return (
-            <Link
-              key={tab.key}
-              href={tab.href}
-              aria-current={active ? 'page' : undefined}
-              className={`shelfry-admin-tab${active ? ' is-active' : ''}`}
-            >
-              {tab.label}
-              {typeof tab.count === 'number' ? (
-                <span className="shelfry-admin-tab__count">{tab.count}</span>
-              ) : null}
-            </Link>
-          )
-        })}
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => go(tab.key, tab.href)}
+            aria-pressed={active === tab.key}
+            className={`shelfry-admin-tab${active === tab.key ? ' is-active' : ''}`}
+          >
+            {tab.label}
+            {typeof tab.count === 'number' ? (
+              <span className="shelfry-admin-tab__count">{tab.count}</span>
+            ) : null}
+          </button>
+        ))}
       </nav>
 
       <div className="shelfry-admin-bulk">
         <span className="shelfry-admin-selection">
-          {count > 0 ? `已选择 ${count} 条` : '勾选投稿后可批量审核'}
+          {count > 0 ? `已选择 ${count} 条` : '勾选后可批量审核'}
         </span>
         <button
           type="button"
@@ -130,7 +147,14 @@ export function SubmissionsToolbar() {
         >
           拒绝
         </button>
-        {message ? <span className="shelfry-admin-message">{message}</span> : null}
+        {isPending ? (
+          <span className="shelfry-admin-loading" aria-live="polite">
+            <Loader2 size={12} className="animate-spin" />
+            加载中
+          </span>
+        ) : message ? (
+          <span className="shelfry-admin-message">{message}</span>
+        ) : null}
       </div>
     </div>
   )

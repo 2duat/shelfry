@@ -1,9 +1,9 @@
 'use client'
 
 import { useSelection } from '@payloadcms/ui'
-import Link from 'next/link'
+import { Loader2 } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 
 type Counts = {
   items: { all: number; published: number; draft: number; hidden: number }
@@ -20,6 +20,14 @@ export function ItemsToolbar() {
   const [counts, setCounts] = useState<Counts | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [isPending, startTransition] = useTransition()
+
+  const currentStatus = searchParams.get('where[status][equals]') || 'all'
+  const [active, setActive] = useState(currentStatus)
+
+  useEffect(() => {
+    setActive(currentStatus)
+  }, [currentStatus])
 
   const loadCounts = useCallback(async () => {
     try {
@@ -34,9 +42,7 @@ export function ItemsToolbar() {
     void loadCounts()
   }, [loadCounts])
 
-  const currentStatus = searchParams.get('where[status][equals]')
   const submissionsBase = pathname.replace(/\/items\/?$/, '/submissions')
-
   const tabs = [
     { key: 'all', label: '全部', href: pathname, count: counts?.items.all },
     {
@@ -45,12 +51,7 @@ export function ItemsToolbar() {
       href: `${pathname}${statusQuery('published')}`,
       count: counts?.items.published,
     },
-    {
-      key: 'draft',
-      label: '草稿',
-      href: `${pathname}${statusQuery('draft')}`,
-      count: counts?.items.draft,
-    },
+    { key: 'draft', label: '草稿', href: `${pathname}${statusQuery('draft')}`, count: counts?.items.draft },
     {
       key: 'hidden',
       label: '已隐藏',
@@ -64,6 +65,12 @@ export function ItemsToolbar() {
       count: counts?.submissions.pending,
     },
   ]
+
+  const go = (key: string, href: string) => {
+    if (isPending || key === active) return
+    setActive(key)
+    startTransition(() => router.push(href, { scroll: false }))
+  }
 
   const applyStatus = async (status: 'published' | 'hidden') => {
     if (!count || busy) return
@@ -100,28 +107,25 @@ export function ItemsToolbar() {
   return (
     <div className="shelfry-admin-list-tools">
       <nav className="shelfry-admin-tabs" aria-label="软件条目状态">
-        {tabs.map((tab) => {
-          const active =
-            tab.key === 'pending' ? false : tab.key === 'all' ? !currentStatus : currentStatus === tab.key
-          return (
-            <Link
-              key={tab.key}
-              href={tab.href}
-              aria-current={active ? 'page' : undefined}
-              className={`shelfry-admin-tab${active ? ' is-active' : ''}`}
-            >
-              {tab.label}
-              {typeof tab.count === 'number' ? (
-                <span className="shelfry-admin-tab__count">{tab.count}</span>
-              ) : null}
-            </Link>
-          )
-        })}
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => go(tab.key, tab.href)}
+            aria-pressed={active === tab.key}
+            className={`shelfry-admin-tab${active === tab.key ? ' is-active' : ''}`}
+          >
+            {tab.label}
+            {typeof tab.count === 'number' ? (
+              <span className="shelfry-admin-tab__count">{tab.count}</span>
+            ) : null}
+          </button>
+        ))}
       </nav>
 
       <div className="shelfry-admin-bulk">
         <span className="shelfry-admin-selection">
-          {count > 0 ? `已选择 ${count} 项` : '勾选项目后可批量操作'}
+          {count > 0 ? `已选择 ${count} 项` : '勾选后可批量操作'}
         </span>
         <button
           type="button"
@@ -139,7 +143,14 @@ export function ItemsToolbar() {
         >
           下架
         </button>
-        {message ? <span className="shelfry-admin-message">{message}</span> : null}
+        {isPending ? (
+          <span className="shelfry-admin-loading" aria-live="polite">
+            <Loader2 size={12} className="animate-spin" />
+            加载中
+          </span>
+        ) : message ? (
+          <span className="shelfry-admin-message">{message}</span>
+        ) : null}
       </div>
     </div>
   )
