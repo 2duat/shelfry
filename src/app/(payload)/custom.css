@@ -870,13 +870,21 @@ html[data-theme='dark'] .os-stats__alert {
 }
 
 
-/* 搜索区与状态工具栏之间不要额外间距 */
+/* 搜索区与状态工具栏合成一张卡片 */
 .collection-list__wrap > .list-controls {
   margin-bottom: 0;
 }
 
 .collection-list__wrap > .shelfry-admin-list-tools {
   margin-bottom: 14px;
+}
+
+.collection-list--items .list-controls .search-bar,
+.collection-list--submissions .list-controls .search-bar {
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-border-color);
+  border-bottom: 0;
+  border-radius: var(--style-radius-m) var(--style-radius-m) 0 0;
 }
 
 /* ---------- 列表页状态标签 / 批量操作 ---------- */
