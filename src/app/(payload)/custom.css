@@ -879,12 +879,19 @@ html[data-theme='dark'] .os-stats__alert {
   margin-bottom: 14px;
 }
 
-.collection-list--items .list-controls .search-bar,
-.collection-list--submissions .list-controls .search-bar {
+.collection-list--items .list-controls,
+.collection-list--submissions .list-controls {
   background: var(--theme-elevation-0);
   border: 1px solid var(--theme-border-color);
   border-bottom: 0;
   border-radius: var(--style-radius-m) var(--style-radius-m) 0 0;
+}
+
+.collection-list--items .list-controls .search-bar,
+.collection-list--submissions .list-controls .search-bar {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
 /* ---------- 列表页状态标签 / 批量操作 ---------- */
