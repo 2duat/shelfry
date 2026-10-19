@@ -870,6 +870,15 @@ html[data-theme='dark'] .os-stats__alert {
 }
 
 
+/* 搜索区与状态工具栏之间不要额外间距 */
+.collection-list__wrap > .list-controls {
+  margin-bottom: 0;
+}
+
+.collection-list__wrap > .shelfry-admin-list-tools {
+  margin-bottom: 14px;
+}
+
 /* ---------- 列表页状态标签 / 批量操作 ---------- */
 .shelfry-admin-list-tools {
   display: flex;
