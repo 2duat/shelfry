@@ -106,19 +106,24 @@ async function runRefresh(payload: any, limit: number, integration: any) {
   return stats
 }
 
-async function runEnrich(payload: any, limit: number, integration: any) {
+async function runEnrich(
+  payload: any,
+  limit: number,
+  integration: any,
+  ids?: (string | number)[],
+) {
   const stats = { enriched: 0, failed: 0 }
+  const conditions: any[] = [
+    { status: { in: ['draft', 'published'] } },
+    { aiEnriched: { not_equals: true } },
+  ]
+  if (ids?.length) conditions.push({ id: { in: ids } })
 
   const candidates = await payload.find({
     collection: 'items',
-    where: {
-      and: [
-        { status: { in: ['draft', 'published'] } },
-        { aiEnriched: { not_equals: true } },
-      ],
-    },
+    where: { and: conditions },
     sort: '-createdAt',
-    limit: Math.max(30, limit * 5),
+    limit: Math.max(ids?.length || 0, 30, limit * 5),
     depth: 0,
   })
 
@@ -211,7 +216,8 @@ async function runEnrich(payload: any, limit: number, integration: any) {
 }
 
 async function runDiscover(payload: any, integration: any, perRule = 12) {
-  const stats = { found: 0, created: 0, skipped: 0, rules: 0 }
+  const stats = { found: 0, created: 0, skipped: 0, rules: 0, queued: 0 }
+  const createdIds: (string | number)[] = []
 
   const settings = await payload.findGlobal({ slug: 'settings', depth: 0, overrideAccess: true })
   const configured = Array.isArray(settings?.discoveryRules)
@@ -269,7 +275,7 @@ async function runDiscover(payload: any, integration: any, perRule = 12) {
         const platforms = inferredPlatforms.length ? inferredPlatforms : ['web']
         const categoryId = await resolveCategoryId(payload, '', kind)
 
-        await payload.create({
+        const created = await payload.create({
           collection: 'items',
           overrideAccess: true,
           context: { skipGithub: true },
@@ -301,10 +307,19 @@ async function runDiscover(payload: any, integration: any, perRule = 12) {
           },
         })
         stats.created += 1
+        createdIds.push(created.id)
       }
     } catch (error) {
       console.error('[cron:discover] rule failed', rule.query, String(error))
     }
+  }
+
+  if (createdIds.length) {
+    stats.queued = createdIds.length
+    console.log(`[cron:discover] queued enrich for ${createdIds.length} new items`)
+    void runEnrich(payload, createdIds.length, integration, createdIds).catch((error) => {
+      console.error('[cron:discover] background enrich failed', String(error))
+    })
   }
 
   return stats
