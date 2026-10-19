@@ -224,6 +224,20 @@ body {
 }
 
 /* ---------- 列表页主视觉 ---------- */
+.collection-list--items,
+.collection-list--submissions {
+  padding-top: 0;
+}
+
+.collection-list__wrap > .list-header {
+  margin-top: -8px;
+  margin-bottom: 10px;
+}
+
+.collection-list__wrap > .list-controls {
+  margin-top: 0;
+}
+
 .list-header {
   position: relative;
   isolation: isolate;
