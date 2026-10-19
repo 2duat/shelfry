@@ -9,6 +9,9 @@ export const Submissions: CollectionConfig = {
     group: '运营',
     defaultColumns: ['repoUrl', 'name', 'status', 'createdAt'],
     description: '前台用户提交的软件推荐，审核通过后在「软件条目」里新建',
+    components: {
+      beforeList: ['/components/admin/SubmissionsToolbar#SubmissionsToolbar'],
+    },
   },
   access: {
     read: authenticated,

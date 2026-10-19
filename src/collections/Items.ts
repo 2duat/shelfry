@@ -42,6 +42,7 @@ export const Items: CollectionConfig = {
     defaultColumns: ['name', 'kind', 'status', 'stars', 'updatedAt'],
     listSearchableFields: ['name', 'githubFullName', 'tagline', 'tagsText'],
     components: {
+      beforeList: ['/components/admin/ItemsToolbar#ItemsToolbar'],
       beforeListTable: ['/components/admin/GithubImport#GithubImport'],
     },
     description:
