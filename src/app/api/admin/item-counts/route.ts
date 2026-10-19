@@ -19,12 +19,22 @@ export async function GET(request: NextRequest) {
     overrideAccess: true,
   })
 
-  const [all, published, draft, hidden, submissions, pending, approved, rejected] =
+  const [all, published, draft, hidden, aiComplete, aiPending, submissions, pending, approved, rejected] =
     await Promise.all([
       payload.count({ collection: 'items', overrideAccess: true }),
       payload.count(itemWhere('published')),
       payload.count(itemWhere('draft')),
       payload.count(itemWhere('hidden')),
+      payload.count({
+        collection: 'items',
+        where: { aiEnriched: { equals: true } },
+        overrideAccess: true,
+      }),
+      payload.count({
+        collection: 'items',
+        where: { aiEnriched: { not_equals: true } },
+        overrideAccess: true,
+      }),
       payload.count({ collection: 'submissions', overrideAccess: true }),
       payload.count({
         collection: 'submissions',
@@ -49,6 +59,8 @@ export async function GET(request: NextRequest) {
       published: published.totalDocs,
       draft: draft.totalDocs,
       hidden: hidden.totalDocs,
+      aiComplete: aiComplete.totalDocs,
+      aiPending: aiPending.totalDocs,
     },
     submissions: {
       all: submissions.totalDocs,

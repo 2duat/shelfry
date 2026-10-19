@@ -940,6 +940,9 @@ html[data-theme='dark'] .os-stats__alert {
 }
 
 .shelfry-admin-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   height: 30px;
   padding: 0 13px;
   border: 1px solid var(--theme-border-color);
