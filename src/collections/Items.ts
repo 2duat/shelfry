@@ -46,6 +46,7 @@ export const Items: CollectionConfig = {
       beforeListTable: [
         '/components/admin/ItemsToolbar#ItemsToolbar',
         '/components/admin/GithubImport#GithubImport',
+        '/components/admin/EmptyListState#EmptyListState',
       ],
       edit: {
         beforeDocumentControls: ['/components/admin/EnrichButton#EnrichButton'],
