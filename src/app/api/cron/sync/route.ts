@@ -144,6 +144,7 @@ async function runEnrich(payload: any, limit: number, integration: any) {
         overrideAccess: true,
         context: { skipGithub: true },
         data: {
+          readme: info.readme ? info.readme.slice(0, 80000) : item.readme || undefined,
           tagline:
             item.source === 'discovery' && !item.aiMeta?.enrichedAt
               ? enrichment.tagline
@@ -154,7 +155,11 @@ async function runEnrich(payload: any, limit: number, integration: any) {
               : item.summary || enrichment.summary,
           kind: item.kind || enrichment.kind,
           ...(categoryId ? { category: categoryId } : {}),
-          platforms: item.platforms?.length ? item.platforms : enrichment.platforms,
+          platforms: item.platforms?.length
+            ? item.platforms
+            : enrichment.platforms.length
+              ? enrichment.platforms
+              : ['web'],
           tagsText: item.tagsText || enrichment.tags.join(', '),
           installCommand: item.installCommand || enrichment.installHint,
           pricing: item.pricing || enrichment.pricing,
@@ -253,14 +258,16 @@ async function runDiscover(payload: any, integration: any, perRule = 12) {
           Boolean(settings?.autoPublish) &&
           Number(repo.stargazers_count || 0) >= Number(settings?.autoPublishStars || 800)
 
-        const categoryId = await resolveCategoryId(payload, '', rule.defaultKind || 'app')
-
         const infoLike = {
           name: repo.name,
           description: repo.description || '',
           topics: repo.topics || [],
           language: repo.language || '',
         }
+        const kind = rule.defaultKind || inferKind(infoLike as any)
+        const inferredPlatforms = inferPlatforms(infoLike as any)
+        const platforms = inferredPlatforms.length ? inferredPlatforms : ['web']
+        const categoryId = await resolveCategoryId(payload, '', kind)
 
         await payload.create({
           collection: 'items',
@@ -274,9 +281,10 @@ async function runDiscover(payload: any, integration: any, perRule = 12) {
             homepage: repo.homepage || '',
             tagline: repo.description || '',
             summary: repo.description || '',
-            kind: rule.defaultKind || inferKind(infoLike as any),
+            kind,
             category: categoryId,
-            platforms: inferPlatforms(infoLike as any),
+            platforms,
+            tagsText: (repo.topics || []).slice(0, 8).join(', '),
             pricing: guessPricing({ license: repo.license?.spdx_id } as any),
             license: repo.license?.spdx_id || '',
             stars: repo.stargazers_count || 0,

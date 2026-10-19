@@ -175,13 +175,19 @@ export async function enrichWithAI(info: RepoInfo, config?: AIConfig): Promise<E
       signal: AbortSignal.timeout(30_000),
     })
 
-    if (!res.ok) return heuristicEnrich(info)
+    if (!res.ok) {
+      console.error('[ai] request failed', res.status, (await res.text()).slice(0, 300))
+      return heuristicEnrich(info)
+    }
 
     const data = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>
     }
     const raw = data.choices?.[0]?.message?.content
-    if (!raw) return heuristicEnrich(info)
+    if (!raw) {
+      console.error('[ai] empty content', JSON.stringify(data).slice(0, 300))
+      return heuristicEnrich(info)
+    }
 
     const parsed = JSON.parse(raw) as Partial<Enrichment>
     const fallback = heuristicEnrich(info)
@@ -218,7 +224,8 @@ export async function enrichWithAI(info: RepoInfo, config?: AIConfig): Promise<E
       pricing: PRICING_VALUES.has(pricing) ? pricing : fallback.pricing,
       aiGenerated: true,
     }
-  } catch {
+  } catch (error) {
+    console.error('[ai] enrich failed', String(error))
     return heuristicEnrich(info)
   }
 }
