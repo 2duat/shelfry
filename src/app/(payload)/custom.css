@@ -1478,3 +1478,181 @@ body:has(.global-edit--settings) .tabs-field__tab .field-type textarea {
     padding: 16px;
   }
 }
+
+
+/* ============================================================
+   后台统一设计系统：所有列表 / 编辑 / 新建 / 设置页
+   ============================================================ */
+:root {
+  --shelfry-admin-max: 1240px;
+}
+
+/* 所有列表页同一宽度 */
+.collection-list .collection-list__wrap {
+  width: 100%;
+  max-width: var(--shelfry-admin-max);
+  margin-inline: auto;
+}
+
+/* 仪表盘同一宽度 */
+.dashboard {
+  width: 100%;
+  max-width: var(--shelfry-admin-max);
+  margin-inline: auto;
+  padding: 24px 28px 48px;
+}
+
+/* 所有编辑 / 新建 / 全局设置页的页头 */
+.doc-header {
+  position: relative;
+  overflow: hidden;
+  width: calc(100% - var(--gutter-h) * 2);
+  max-width: var(--shelfry-admin-max);
+  margin: 10px auto 0;
+  padding: 24px 28px;
+  border-radius: 20px;
+  color: #fff;
+  background:
+    radial-gradient(520px 220px at 92% -20%, rgba(56, 189, 248, 0.5), transparent 65%),
+    radial-gradient(420px 220px at 5% 120%, rgba(99, 102, 241, 0.36), transparent 70%),
+    linear-gradient(135deg, #0b1220 0%, #102a4c 58%, #0a4f8f 100%);
+  box-shadow: 0 18px 40px -30px rgba(2, 20, 45, 0.9);
+}
+
+.doc-header::after {
+  display: none;
+}
+
+.doc-header__title {
+  color: #fff;
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.doc-header__header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.doc-tabs__tabs {
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.doc-tabs .btn,
+.doc-tabs .doc-tab {
+  border: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.doc-tabs .doc-tab--active {
+  background: #fff !important;
+  color: #0b1220 !important;
+}
+
+/* 所有编辑页保存栏 */
+.doc-controls {
+  position: sticky;
+  top: var(--app-header-height);
+  z-index: 24;
+  width: calc(100% - var(--gutter-h) * 2);
+  max-width: var(--shelfry-admin-max);
+  margin: 12px auto 0;
+  padding: 8px 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--theme-elevation-0) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.doc-controls__divider {
+  display: none;
+}
+
+/* 所有编辑页内容 */
+.collection-edit__main-wrapper {
+  width: 100%;
+  max-width: var(--shelfry-admin-max);
+  margin: 14px auto 0;
+}
+
+.document-fields__edit {
+  padding: 0;
+}
+
+/* 所有表单的标签页和内容卡片 */
+.collection-edit .tabs-field__tabs-wrap {
+  margin-bottom: 10px;
+}
+
+.collection-edit .tabs-field__tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--theme-elevation-100);
+}
+
+.collection-edit .tabs-field__tab-button {
+  height: 32px;
+  padding: 0 16px;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--theme-elevation-500);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.collection-edit .tabs-field__tab-button--active {
+  background: linear-gradient(135deg, #0071e3, #4f46e5);
+  color: #fff;
+}
+
+.collection-edit .tabs-field__content-wrap {
+  margin-top: 10px;
+  padding: 20px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 16px;
+  background: var(--theme-elevation-0);
+  box-shadow: 0 18px 36px -32px rgba(0, 0, 0, 0.45);
+}
+
+/* 设置页覆盖旧的固定宽度 */
+body:has(.global-edit--settings) .doc-header,
+body:has(.global-edit--settings) .doc-controls {
+  max-width: var(--shelfry-admin-max);
+}
+
+body:has(.global-edit--settings) .collection-edit__main-wrapper {
+  max-width: var(--shelfry-admin-max);
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 18px 16px 40px;
+  }
+
+  .doc-header {
+    width: calc(100% - var(--gutter-h) * 2);
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .doc-controls {
+    width: calc(100% - var(--gutter-h) * 2);
+    padding: 8px 12px;
+  }
+
+  .collection-edit .tabs-field__content-wrap {
+    padding: 14px;
+  }
+}
