@@ -42,8 +42,10 @@ export const Items: CollectionConfig = {
     defaultColumns: ['name', 'kind', 'status', 'stars', 'updatedAt'],
     listSearchableFields: ['name', 'githubFullName', 'tagline', 'tagsText'],
     components: {
-      beforeList: ['/components/admin/ItemsToolbar#ItemsToolbar'],
-      beforeListTable: ['/components/admin/GithubImport#GithubImport'],
+      beforeListTable: [
+        '/components/admin/ItemsToolbar#ItemsToolbar',
+        '/components/admin/GithubImport#GithubImport',
+      ],
     },
     description:
       '常用信息都在第一屏；发布状态、推荐位在右侧栏。自动抓取的字段收在「GitHub 数据」里，平时不用管。',

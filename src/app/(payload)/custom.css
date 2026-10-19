@@ -872,7 +872,7 @@ html[data-theme='dark'] .os-stats__alert {
 
 /* ---------- 列表页状态标签 / 批量操作 ---------- */
 .shelfry-admin-list-tools {
-  padding: 20px 24px 0;
+  padding: 0 0 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -971,6 +971,6 @@ html[data-theme='dark'] .os-stats__alert {
 
 @media (max-width: 768px) {
   .shelfry-admin-list-tools {
-    padding: 14px 16px 0;
+    padding: 0 0 12px;
   }
 }
