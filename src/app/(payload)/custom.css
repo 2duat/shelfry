@@ -1056,7 +1056,8 @@ html[data-theme='dark'] .os-stats__alert {
 
 
 /* ---------- 空列表：保留表头 ---------- */
-.collection-list--items .no-results {
+.collection-list--items .no-results,
+.collection-list--submissions .no-results {
   display: none;
 }
 
@@ -1142,4 +1143,29 @@ html[data-theme='dark'] .os-stats__alert {
 .shelfry-admin-list-tools--submissions .shelfry-admin-bulk {
   flex-basis: 100%;
   margin-left: 0;
+}
+
+
+.shelfry-empty-table--submissions .shelfry-empty-table__head {
+  grid-template-columns: minmax(220px, 1.6fr) 1fr 1fr 1fr;
+}
+
+/* 滚动时把搜索 + 状态导航固定在顶部 */
+.collection-list__wrap > .list-controls {
+  position: sticky;
+  top: 0;
+  z-index: 22;
+  background: var(--theme-bg);
+}
+
+.collection-list__wrap > .shelfry-admin-list-tools {
+  position: sticky;
+  top: 46px;
+  z-index: 21;
+}
+
+@media (max-width: 768px) {
+  .collection-list__wrap > .shelfry-admin-list-tools {
+    top: 46px;
+  }
 }
