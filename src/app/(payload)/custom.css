@@ -1656,3 +1656,95 @@ body:has(.global-edit--settings) .collection-edit__main-wrapper {
     padding: 14px;
   }
 }
+
+
+/* ============================================================
+   恢复后台满宽（不再限 1240）
+   ============================================================ */
+.collection-list .collection-list__wrap,
+.collection-list--items .collection-list__wrap,
+.collection-list--submissions .collection-list__wrap {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+.dashboard {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding: 24px 34px 48px;
+}
+
+.doc-header,
+.doc-controls {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.doc-header {
+  margin-top: 10px;
+}
+
+.doc-controls {
+  margin-top: 12px;
+}
+
+.collection-edit__main-wrapper {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body:has(.global-edit--settings) .doc-header,
+body:has(.global-edit--settings) .doc-controls,
+body:has(.global-edit--settings) .collection-edit__main-wrapper {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ============================================================
+   站点设置：字段单列对齐，修掉标签下横线
+   ============================================================ */
+body:has(.global-edit--settings) .tabs-field__tabs-wrap {
+  border-bottom: 0 !important;
+}
+
+body:has(.global-edit--settings) .tabs-field__tabs {
+  border-bottom: 0 !important;
+}
+
+body:has(.global-edit--settings) .tabs-field__tab-button {
+  box-shadow: none !important;
+}
+
+body:has(.global-edit--settings) .tabs-field__tab-button::after,
+body:has(.global-edit--settings) .tabs-field__tab-button::before {
+  display: none !important;
+}
+
+body:has(.global-edit--settings) .tabs-field__tab > .render-fields {
+  display: block;
+}
+
+body:has(.global-edit--settings) .tabs-field__tab > .render-fields > .field-type {
+  display: block;
+  width: 100%;
+  flex: none;
+  margin-bottom: 18px;
+}
+
+body:has(.global-edit--settings) .tabs-field__tab > .render-fields > .field-type:last-child {
+  margin-bottom: 0;
+}
+
+body:has(.global-edit--settings) .tabs-field__tab .field-type input,
+body:has(.global-edit--settings) .tabs-field__tab .field-type textarea,
+body:has(.global-edit--settings) .tabs-field__tab .field-type .rs__control {
+  width: 100%;
+}
