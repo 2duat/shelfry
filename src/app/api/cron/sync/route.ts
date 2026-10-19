@@ -205,7 +205,7 @@ async function runEnrich(payload: any, limit: number, integration: any) {
   return stats
 }
 
-async function runDiscover(payload: any, integration: any, perRule = 8) {
+async function runDiscover(payload: any, integration: any, perRule = 12) {
   const stats = { found: 0, created: 0, skipped: 0, rules: 0 }
 
   const settings = await payload.findGlobal({ slug: 'settings', depth: 0, overrideAccess: true })
@@ -220,11 +220,17 @@ async function runDiscover(payload: any, integration: any, perRule = 8) {
   for (const rule of rules.slice(0, 4)) {
     stats.rules += 1
     try {
+      // 每次随机翻页，避免永远只看到同一批 Top 仓库
+      const page = 1 + Math.floor(Math.random() * 10)
       const response = await fetch(
         `https://api.github.com/search/repositories?q=${encodeURIComponent(
           rule.query,
-        )}&sort=stars&order=desc&per_page=${perRule}`,
-        { headers: ghHeaders(integration.githubToken), cache: 'no-store' },
+        )}&sort=stars&order=desc&per_page=${perRule}&page=${page}`,
+        {
+          headers: ghHeaders(integration.githubToken),
+          cache: 'no-store',
+          signal: AbortSignal.timeout(20_000),
+        },
       )
       if (!response.ok) continue
       const data = (await response.json()) as { items?: any[] }
