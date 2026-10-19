@@ -1110,3 +1110,19 @@ html[data-theme='dark'] .os-stats__alert {
     padding: 20px 14px;
   }
 }
+
+
+.shelfry-admin-tabs--full {
+  flex-basis: 100%;
+}
+
+.shelfry-admin-tabs--sub {
+  flex-basis: 100%;
+  padding-top: 7px;
+  border-top: 1px solid var(--theme-border-color);
+}
+
+.shelfry-admin-list-tools--submissions .shelfry-admin-bulk {
+  flex-basis: 100%;
+  margin-left: 0;
+}

@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 
 type Counts = {
+  items: { all: number; published: number; draft: number; hidden: number }
   submissions: { all: number; pending: number; approved: number; rejected: number }
 }
 
@@ -24,6 +25,7 @@ export function SubmissionsToolbar() {
 
   const currentStatus = searchParams.get('where[status][equals]') || 'all'
   const [active, setActive] = useState(currentStatus)
+  const [pendingItem, setPendingItem] = useState<string | null>(null)
 
   useEffect(() => {
     setActive(currentStatus)
@@ -43,8 +45,31 @@ export function SubmissionsToolbar() {
   }, [loadCounts])
 
   const itemsBase = pathname.replace(/\/submissions\/?$/, '/items')
-  const tabs = [
-    { key: 'all', label: '全部', href: pathname, count: counts?.submissions.all },
+  const itemsTabs = [
+    { key: 'items-all', label: '全部', href: itemsBase, count: counts?.items.all },
+    {
+      key: 'items-published',
+      label: '已发布',
+      href: `${itemsBase}${statusQuery('published')}`,
+      count: counts?.items.published,
+    },
+    { key: 'items-draft', label: '草稿', href: `${itemsBase}${statusQuery('draft')}`, count: counts?.items.draft },
+    {
+      key: 'items-hidden',
+      label: '已隐藏',
+      href: `${itemsBase}${statusQuery('hidden')}`,
+      count: counts?.items.hidden,
+    },
+    {
+      key: 'submissions',
+      label: '投稿审核',
+      href: `${pathname}${statusQuery('pending')}`,
+      count: counts?.submissions.pending,
+    },
+  ]
+
+  const statusTabs = [
+    { key: 'all', label: '全部投稿', href: pathname, count: counts?.submissions.all },
     {
       key: 'pending',
       label: '待审核',
@@ -65,7 +90,13 @@ export function SubmissionsToolbar() {
     },
   ]
 
-  const go = (key: string, href: string) => {
+  const goItem = (key: string, href: string) => {
+    if (isPending) return
+    setPendingItem(key)
+    startTransition(() => router.push(href, { scroll: false }))
+  }
+
+  const goStatus = (key: string, href: string) => {
     if (isPending || key === active) return
     setActive(key)
     startTransition(() => router.push(href, { scroll: false }))
@@ -104,18 +135,40 @@ export function SubmissionsToolbar() {
   }
 
   return (
-    <div className="shelfry-admin-list-tools">
+    <div className="shelfry-admin-list-tools shelfry-admin-list-tools--submissions">
       <Link href={itemsBase} className="shelfry-admin-back">
         <ArrowLeft size={13} />
         软件条目
       </Link>
 
-      <nav className="shelfry-admin-tabs" aria-label="投稿状态">
-        {tabs.map((tab) => (
+      <nav className="shelfry-admin-tabs shelfry-admin-tabs--full" aria-label="软件条目状态">
+        {itemsTabs.map((tab) => {
+          const selected = pendingItem ? pendingItem === tab.key : tab.key === 'submissions'
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => goItem(tab.key, tab.href)}
+              onMouseEnter={() => router.prefetch(tab.href)}
+              aria-pressed={selected}
+              className={`shelfry-admin-tab${selected ? ' is-active' : ''}`}
+            >
+              {tab.label}
+              {typeof tab.count === 'number' ? (
+                <span className="shelfry-admin-tab__count">{tab.count}</span>
+              ) : null}
+            </button>
+          )
+        })}
+      </nav>
+
+      <nav className="shelfry-admin-tabs shelfry-admin-tabs--sub" aria-label="投稿状态">
+        {statusTabs.map((tab) => (
           <button
             key={tab.key}
             type="button"
-            onClick={() => go(tab.key, tab.href)}
+            onClick={() => goStatus(tab.key, tab.href)}
+            onMouseEnter={() => router.prefetch(tab.href)}
             aria-pressed={active === tab.key}
             className={`shelfry-admin-tab${active === tab.key ? ' is-active' : ''}`}
           >

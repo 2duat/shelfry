@@ -186,6 +186,7 @@ export function ItemsToolbar() {
             key={tab.key}
             type="button"
             onClick={() => go(tab.key, tab.href)}
+            onMouseEnter={() => router.prefetch(tab.href)}
             aria-pressed={active === tab.key}
             className={`shelfry-admin-tab${active === tab.key ? ' is-active' : ''}`}
           >
