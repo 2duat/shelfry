@@ -1781,7 +1781,8 @@ html[data-theme='dark'] .os-stats__alert {
 .global-edit--settings .doc-controls {
   position: absolute;
   top: 22px;
-  right: 20px;
+  /* 表单容器比卡片宽一个 gutter，right 要加上 gutter 才对得齐卡片右边缘 */
+  right: calc(var(--gutter-h) + 18px);
   z-index: 4;
   width: auto !important;
   max-width: none !important;
@@ -1803,6 +1804,22 @@ html[data-theme='dark'] .os-stats__alert {
 .global-edit--settings .doc-controls__meta,
 .global-edit--settings .doc-controls__divider {
   display: none !important;
+}
+
+/* Payload 给 doc-controls 内部包了一层 --theme-bg 背景 + 顶部边框 + 右侧 gutter padding，
+   放在卡片里就是那个"歪掉的白框"，这里全部清掉，只留按钮本身。 */
+.global-edit--settings .doc-controls__wrapper,
+.global-edit--settings .doc-controls__content,
+.global-edit--settings .doc-controls__controls-wrapper,
+.global-edit--settings .doc-controls__controls {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 /* 站点设置：标签行做成卡片头部，与保存按钮同一条基线 */
