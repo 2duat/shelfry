@@ -8,6 +8,10 @@ export const Media: CollectionConfig = {
   admin: {
     group: '系统',
     description: '上传的图标与截图，保存到站点 uploads/ 目录',
+    defaultColumns: ['filename', 'mimeType', 'filesize', 'updatedAt'],
+    components: {
+      beforeListTable: ['/components/admin/EmptyListState#EmptyListState'],
+    },
   },
   access: {
     read: anyone,

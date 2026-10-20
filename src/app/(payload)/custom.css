@@ -13,6 +13,13 @@ html {
   --style-radius-l: 16px;
   --os-accent: #0071e3;
   --os-accent-soft: rgba(0, 113, 227, 0.1);
+  /* 统一页头渐变：列表页与编辑页共用一套参数，避免两处各写一份漂移 */
+  --sr-hero-list: radial-gradient(520px 260px at 92% -10%, rgba(56, 189, 248, 0.5), transparent 65%),
+    radial-gradient(420px 260px at 8% 120%, rgba(99, 102, 241, 0.42), transparent 70%),
+    linear-gradient(135deg, #0b1220 0%, #102a4c 55%, #0a4f8f 100%);
+  --sr-hero-doc: radial-gradient(520px 220px at 92% -20%, rgba(56, 189, 248, 0.5), transparent 65%),
+    radial-gradient(420px 220px at 5% 120%, rgba(99, 102, 241, 0.36), transparent 70%),
+    linear-gradient(135deg, #0b1220 0%, #102a4c 58%, #0a4f8f 100%);
 }
 
 html[data-theme='light'] {
@@ -146,19 +153,6 @@ body {
   gap: 10px;
 }
 
-.os-nav-head__mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-  box-shadow: 0 4px 12px -4px rgba(59, 130, 246, 0.6);
-}
-
 .os-nav-head__text {
   display: flex;
   flex-direction: column;
@@ -243,13 +237,10 @@ body {
   isolation: isolate;
   overflow: hidden;
   margin: 2px 0 0;
-  padding: 28px 30px 26px;
-  border-radius: 20px;
+  padding: 24px 28px 22px !important;
+  border-radius: 18px !important;
   color: #fff;
-  background:
-    radial-gradient(520px 260px at 92% -10%, rgba(56, 189, 248, 0.5), transparent 65%),
-    radial-gradient(420px 260px at 8% 120%, rgba(99, 102, 241, 0.42), transparent 70%),
-    linear-gradient(135deg, #0b1220 0%, #102a4c 55%, #0a4f8f 100%);
+  background: var(--sr-hero-list);
   box-shadow: 0 20px 44px -30px rgba(2, 20, 45, 0.9);
 }
 
@@ -284,7 +275,7 @@ body {
 .list-header__title {
   margin: 0;
   color: #fff;
-  font-size: clamp(30px, 3.4vw, 42px);
+  font-size: clamp(28px, 3vw, 36px) !important;
   line-height: 1.06;
   letter-spacing: -0.04em;
   font-weight: 700;
@@ -363,70 +354,10 @@ body {
 
 /* ---------- 仪表盘 ---------- */
 .dashboard {
-  padding: 28px 34px 48px;
-  max-width: 1400px;
-}
-
-.collections {
-  gap: 30px;
-}
-
-.collections__label {
-  font-size: 11.5px;
-  font-weight: 650;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--theme-elevation-450);
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--theme-border-color);
-}
-
-.collections__card-list {
-  gap: 12px;
-}
-
-.card {
-  border-style: solid;
-  border-radius: 14px;
-  padding: 18px 18px 18px 52px;
-  min-height: 84px;
-  display: flex;
-  align-items: center;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.45);
-  border-color: color-mix(in srgb, var(--os-accent) 40%, var(--theme-border-color));
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  width: 20px;
-  height: 20px;
-  margin-top: -10px;
-  background-color: var(--os-accent);
-  opacity: 0.85;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
-.card__title {
-  font-size: 14.5px;
-  font-weight: 600;
-}
-
-.card__actions {
-  margin-left: auto;
+  /* 与列表页共用同一套 gutter，避免页头左右边缘对不齐 */
+  padding: 28px var(--gutter-h) 48px;
+  max-width: none;
+  margin-inline: 0;
 }
 
 /* ---------- 列表 / 表格 ---------- */
@@ -484,24 +415,15 @@ select,
 
 /* ---------- 图标分配 ---------- */
 #nav-items { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMSA4YTIgMiAwIDAgMC0xLTEuNzNsLTctNGEyIDIgMCAwIDAtMiAwbC03IDRBMiAyIDAgMCAwIDMgOHY4YTIgMiAwIDAgMCAxIDEuNzNsNyA0YTIgMiAwIDAgMCAyIDBsNy00QTIgMiAwIDAgMCAyMSAxNloiLz48cGF0aCBkPSJtMy4zIDcgOC43IDUgOC43LTUiLz48cGF0aCBkPSJNMTIgMjJWMTIiLz48L3N2Zz4="); }
-.card-items::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMSA4YTIgMiAwIDAgMC0xLTEuNzNsLTctNGEyIDIgMCAwIDAtMiAwbC03IDRBMiAyIDAgMCAwIDMgOHY4YTIgMiAwIDAgMCAxIDEuNzNsNyA0YTIgMiAwIDAgMCAyIDBsNy00QTIgMiAwIDAgMCAyMSAxNloiLz48cGF0aCBkPSJtMy4zIDcgOC43IDUgOC43LTUiLz48cGF0aCBkPSJNMTIgMjJWMTIiLz48L3N2Zz4="); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMSA4YTIgMiAwIDAgMC0xLTEuNzNsLTctNGEyIDIgMCAwIDAtMiAwbC03IDRBMiAyIDAgMCAwIDMgOHY4YTIgMiAwIDAgMCAxIDEuNzNsNyA0YTIgMiAwIDAgMCAyIDBsNy00QTIgMiAwIDAgMCAyMSAxNloiLz48cGF0aCBkPSJtMy4zIDcgOC43IDUgOC43LTUiLz48cGF0aCBkPSJNMTIgMjJWMTIiLz48L3N2Zz4="); }
 #nav-categories { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCAyMGEyIDIgMCAwIDAgMi0yVjhhMiAyIDAgMCAwLTItMmgtNy45YTIgMiAwIDAgMS0xLjY5LS45TDkuNiAzLjlBMiAyIDAgMCAwIDcuOTMgM0g0YTIgMiAwIDAgMC0yIDJ2MTNhMiAyIDAgMCAwIDIgMloiLz48L3N2Zz4="); }
-.card-categories::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCAyMGEyIDIgMCAwIDAgMi0yVjhhMiAyIDAgMCAwLTItMmgtNy45YTIgMiAwIDAgMS0xLjY5LS45TDkuNiAzLjlBMiAyIDAgMCAwIDcuOTMgM0g0YTIgMiAwIDAgMC0yIDJ2MTNhMiAyIDAgMCAwIDIgMloiLz48L3N2Zz4="); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCAyMGEyIDIgMCAwIDAgMi0yVjhhMiAyIDAgMCAwLTItMmgtNy45YTIgMiAwIDAgMS0xLjY5LS45TDkuNiAzLjlBMiAyIDAgMCAwIDcuOTMgM0g0YTIgMiAwIDAgMC0yIDJ2MTNhMiAyIDAgMCAwIDIgMloiLz48L3N2Zz4="); }
 #nav-tags { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xMi41ODYgMi41ODZBMiAyIDAgMCAwIDExLjE3MiAySDRhMiAyIDAgMCAwLTIgMnY3LjE3MmEyIDIgMCAwIDAgLjU4NiAxLjQxNGw4LjcwNCA4LjcwNGEyLjQyNiAyLjQyNiAwIDAgMCAzLjQyIDBsNi41OC02LjU4YTIuNDI2IDIuNDI2IDAgMCAwIDAtMy40MnoiLz48Y2lyY2xlIGN4PSI3LjUiIGN5PSI3LjUiIHI9IjEiIGZpbGw9ImJsYWNrIi8+PC9zdmc+"); }
-.card-tags::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xMi41ODYgMi41ODZBMiAyIDAgMCAwIDExLjE3MiAySDRhMiAyIDAgMCAwLTIgMnY3LjE3MmEyIDIgMCAwIDAgLjU4NiAxLjQxNGw4LjcwNCA4LjcwNGEyLjQyNiAyLjQyNiAwIDAgMCAzLjQyIDBsNi41OC02LjU4YTIuNDI2IDIuNDI2IDAgMCAwIDAtMy40MnoiLz48Y2lyY2xlIGN4PSI3LjUiIGN5PSI3LjUiIHI9IjEiIGZpbGw9ImJsYWNrIi8+PC9zdmc+"); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xMi41ODYgMi41ODZBMiAyIDAgMCAwIDExLjE3MiAySDRhMiAyIDAgMCAwLTIgMnY3LjE3MmEyIDIgMCAwIDAgLjU4NiAxLjQxNGw4LjcwNCA4LjcwNGEyLjQyNiAyLjQyNiAwIDAgMCAzLjQyIDBsNi41OC02LjU4YTIuNDI2IDIuNDI2IDAgMCAwIDAtMy40MnoiLz48Y2lyY2xlIGN4PSI3LjUiIGN5PSI3LjUiIHI9IjEiIGZpbGw9ImJsYWNrIi8+PC9zdmc+"); }
 #nav-curated-lists { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Im0xMi44MyAyLjE4YTIgMiAwIDAgMC0xLjY2IDBMMi42IDYuMDhhMSAxIDAgMCAwIDAgMS44M2w4LjU4IDMuOTFhMiAyIDAgMCAwIDEuNjYgMGw4LjU4LTMuOWExIDEgMCAwIDAgMC0xLjgzWiIvPjxwYXRoIGQ9Im0yMiAxNy42NS05LjE3IDQuMTZhMiAyIDAgMCAxLTEuNjYgMEwyIDE3LjY1Ii8+PHBhdGggZD0ibTIyIDEyLjY1LTkuMTcgNC4xNmEyIDIgMCAwIDEtMS42NiAwTDIgMTIuNjUiLz48L3N2Zz4="); }
-.card-curated-lists::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Im0xMi44MyAyLjE4YTIgMiAwIDAgMC0xLjY2IDBMMi42IDYuMDhhMSAxIDAgMCAwIDAgMS44M2w4LjU4IDMuOTFhMiAyIDAgMCAwIDEuNjYgMGw4LjU4LTMuOWExIDEgMCAwIDAgMC0xLjgzWiIvPjxwYXRoIGQ9Im0yMiAxNy42NS05LjE3IDQuMTZhMiAyIDAgMCAxLTEuNjYgMEwyIDE3LjY1Ii8+PHBhdGggZD0ibTIyIDEyLjY1LTkuMTcgNC4xNmEyIDIgMCAwIDEtMS42NiAwTDIgMTIuNjUiLz48L3N2Zz4="); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Im0xMi44MyAyLjE4YTIgMiAwIDAgMC0xLjY2IDBMMi42IDYuMDhhMSAxIDAgMCAwIDAgMS44M2w4LjU4IDMuOTFhMiAyIDAgMCAwIDEuNjYgMGw4LjU4LTMuOWExIDEgMCAwIDAgMC0xLjgzWiIvPjxwYXRoIGQ9Im0yMiAxNy42NS05LjE3IDQuMTZhMiAyIDAgMCAxLTEuNjYgMEwyIDE3LjY1Ii8+PHBhdGggZD0ibTIyIDEyLjY1LTkuMTcgNC4xNmEyIDIgMCAwIDEtMS42NiAwTDIgMTIuNjUiLz48L3N2Zz4="); }
 #nav-submissions { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMmgtNmwtMiAzaC00bC0yLTNIMiIvPjxwYXRoIGQ9Ik01LjQ1IDUuMTEgMiAxMnY2YTIgMiAwIDAgMCAyIDJoMTZhMiAyIDAgMCAwIDItMnYtNmwtMy40NS02Ljg5QTIgMiAwIDAgMCAxNi43NiA0SDcuMjRhMiAyIDAgMCAwLTEuNzkgMS4xMXoiLz48L3N2Zz4="); }
-.card-submissions::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMmgtNmwtMiAzaC00bC0yLTNIMiIvPjxwYXRoIGQ9Ik01LjQ1IDUuMTEgMiAxMnY2YTIgMiAwIDAgMCAyIDJoMTZhMiAyIDAgMCAwIDItMnYtNmwtMy40NS02Ljg5QTIgMiAwIDAgMCAxNi43NiA0SDcuMjRhMiAyIDAgMCAwLTEuNzkgMS4xMXoiLz48L3N2Zz4="); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMmgtNmwtMiAzaC00bC0yLTNIMiIvPjxwYXRoIGQ9Ik01LjQ1IDUuMTEgMiAxMnY2YTIgMiAwIDAgMCAyIDJoMTZhMiAyIDAgMCAwIDItMnYtNmwtMy40NS02Ljg5QTIgMiAwIDAgMCAxNi43NiA0SDcuMjRhMiAyIDAgMCAwLTEuNzkgMS4xMXoiLz48L3N2Zz4="); }
 #nav-sync-runs { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0zIDEyYTkgOSAwIDEgMCA5LTkgOS43NSA5Ljc1IDAgMCAwLTYuNzQgMi43NEwzIDgiLz48cGF0aCBkPSJNMyAzdjVoNSIvPjxwYXRoIGQ9Ik0xMiA3djVsNCAyIi8+PC9zdmc+"); }
-.card-sync-runs::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0zIDEyYTkgOSAwIDEgMCA5LTkgOS43NSA5Ljc1IDAgMCAwLTYuNzQgMi43NEwzIDgiLz48cGF0aCBkPSJNMyAzdjVoNSIvPjxwYXRoIGQ9Ik0xMiA3djVsNCAyIi8+PC9zdmc+"); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0zIDEyYTkgOSAwIDEgMCA5LTkgOS43NSA5Ljc1IDAgMCAwLTYuNzQgMi43NEwzIDgiLz48cGF0aCBkPSJNMyAzdjVoNSIvPjxwYXRoIGQ9Ik0xMiA3djVsNCAyIi8+PC9zdmc+"); }
 #nav-media { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgeD0iMyIgeT0iMyIgcng9IjIiLz48Y2lyY2xlIGN4PSI5IiBjeT0iOSIgcj0iMiIvPjxwYXRoIGQ9Im0yMSAxNS0zLjA4Ni0zLjA4NmEyIDIgMCAwIDAtMi44MjggMEw2IDIxIi8+PC9zdmc+"); }
-.card-media::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgeD0iMyIgeT0iMyIgcng9IjIiLz48Y2lyY2xlIGN4PSI5IiBjeT0iOSIgcj0iMiIvPjxwYXRoIGQ9Im0yMSAxNS0zLjA4Ni0zLjA4NmEyIDIgMCAwIDAtMi44MjggMEw2IDIxIi8+PC9zdmc+"); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgeD0iMyIgeT0iMyIgcng9IjIiLz48Y2lyY2xlIGN4PSI5IiBjeT0iOSIgcj0iMiIvPjxwYXRoIGQ9Im0yMSAxNS0zLjA4Ni0zLjA4NmEyIDIgMCAwIDAtMi44MjggMEw2IDIxIi8+PC9zdmc+"); }
 #nav-users { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNiAyMXYtMmE0IDQgMCAwIDAtNC00SDZhNCA0IDAgMCAwLTQgNHYyIi8+PGNpcmNsZSBjeD0iOSIgY3k9IjciIHI9IjQiLz48cGF0aCBkPSJNMjIgMjF2LTJhNCA0IDAgMCAwLTMtMy44NyIvPjxwYXRoIGQ9Ik0xNiAzLjEzYTQgNCAwIDAgMSAwIDcuNzUiLz48L3N2Zz4="); }
-.card-users::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNiAyMXYtMmE0IDQgMCAwIDAtNC00SDZhNCA0IDAgMCAwLTQgNHYyIi8+PGNpcmNsZSBjeD0iOSIgY3k9IjciIHI9IjQiLz48cGF0aCBkPSJNMjIgMjF2LTJhNCA0IDAgMCAwLTMtMy44NyIvPjxwYXRoIGQ9Ik0xNiAzLjEzYTQgNCAwIDAgMSAwIDcuNzUiLz48L3N2Zz4="); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNiAyMXYtMmE0IDQgMCAwIDAtNC00SDZhNCA0IDAgMCAwLTQgNHYyIi8+PGNpcmNsZSBjeD0iOSIgY3k9IjciIHI9IjQiLz48cGF0aCBkPSJNMjIgMjF2LTJhNCA0IDAgMCAwLTMtMy44NyIvPjxwYXRoIGQ9Ik0xNiAzLjEzYTQgNCAwIDAgMSAwIDcuNzUiLz48L3N2Zz4="); }
 #nav-settings,
 #nav-global-settings { --os-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik00IDIxdi03Ii8+PHBhdGggZD0iTTQgMTBWMyIvPjxwYXRoIGQ9Ik0xMiAyMXYtOSIvPjxwYXRoIGQ9Ik0xMiA4VjMiLz48cGF0aCBkPSJNMjAgMjF2LTUiLz48cGF0aCBkPSJNMjAgMTJWMyIvPjxwYXRoIGQ9Ik0xIDE0aDYiLz48cGF0aCBkPSJNOSA4aDYiLz48cGF0aCBkPSJNMTcgMTZoNiIvPjwvc3ZnPg=="); }
-.card-settings::before { -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik00IDIxdi03Ii8+PHBhdGggZD0iTTQgMTBWMyIvPjxwYXRoIGQ9Ik0xMiAyMXYtOSIvPjxwYXRoIGQ9Ik0xMiA4VjMiLz48cGF0aCBkPSJNMjAgMjF2LTUiLz48cGF0aCBkPSJNMjAgMTJWMyIvPjxwYXRoIGQ9Ik0xIDE0aDYiLz48cGF0aCBkPSJNOSA4aDYiLz48cGF0aCBkPSJNMTcgMTZoNiIvPjwvc3ZnPg=="); mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik00IDIxdi03Ii8+PHBhdGggZD0iTTQgMTBWMyIvPjxwYXRoIGQ9Ik0xMiAyMXYtOSIvPjxwYXRoIGQ9Ik0xMiA4VjMiLz48cGF0aCBkPSJNMjAgMjF2LTUiLz48cGF0aCBkPSJNMjAgMTJWMyIvPjxwYXRoIGQ9Ik0xIDE0aDYiLz48cGF0aCBkPSJNOSA4aDYiLz48cGF0aCBkPSJNMTcgMTZoNiIvPjwvc3ZnPg=="); }
 
 
 /* ---------- 一键导入面板 ---------- */
@@ -649,24 +571,104 @@ html[data-theme='dark'] .os-import__msg--error {
   margin-bottom: 28px;
 }
 
-.os-stats__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+/* ---------- 统一 Hero：仪表盘与所有列表页共用 ---------- */
+.shelfry-hero {
   margin-bottom: 12px;
 }
 
-.os-stats__title {
-  font-size: 14px;
-  font-weight: 650;
-  color: var(--theme-elevation-1000);
+.shelfry-hero__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
 }
 
-.os-stats__sub {
-  margin-top: 3px;
-  font-size: 12px;
-  color: var(--theme-elevation-450);
+.shelfry-hero__eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: rgba(186, 222, 255, 0.82);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+}
+
+.shelfry-hero__title {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(28px, 3vw, 36px) !important;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+.shelfry-hero__desc {
+  max-width: 760px;
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.shelfry-hero__desc .os-stats__alert {
+  color: #ffb4ab;
+}
+
+.shelfry-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.shelfry-hero__button,
+.shelfry-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.shelfry-hero__button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.shelfry-hero__button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.shelfry-hero__cta {
+  background: #fff;
+  border-color: transparent;
+  color: #0b1220;
+}
+
+.shelfry-hero__cta:hover {
+  background: #eaf5ff;
+  color: #0b1220;
+}
+
+.os-stats__error {
+  padding: 14px 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 14px;
+  background: var(--theme-elevation-0);
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+html[data-theme='dark'] .os-stats__error {
+  color: #ff6961;
 }
 
 .os-stats__alert {
@@ -680,25 +682,6 @@ html[data-theme='dark'] .os-stats__alert {
 .os-stats__muted {
   font-size: 12px;
   color: var(--theme-elevation-450);
-}
-
-.os-stats__refresh {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 12px;
-  border: 1px solid var(--theme-border-color);
-  border-radius: 8px;
-  background: var(--theme-elevation-0);
-  color: var(--theme-elevation-700);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.os-stats__refresh:hover {
-  border-color: var(--os-accent);
-  color: var(--os-accent);
 }
 
 .os-spin {
@@ -717,13 +700,13 @@ html[data-theme='dark'] .os-stats__alert {
   gap: 10px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .os-stats__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .os-stats__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -767,7 +750,7 @@ html[data-theme='dark'] .os-stats__alert {
   margin-top: 10px;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
   .os-stats__panels {
     grid-template-columns: 1fr;
   }
@@ -918,13 +901,13 @@ html[data-theme='dark'] .os-stats__alert {
   gap: 8px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1024px) {
   .os-quick__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .os-quick__grid {
     grid-template-columns: 1fr;
   }
@@ -1006,6 +989,8 @@ html[data-theme='dark'] .os-stats__alert {
 }
 
 /* 默认的集合入口由「快捷入口」统一承载 */
+/* 仪表盘用自定义统计面板，隐藏 Payload 默认集合卡片；
+   原 .collections / .card* 样式已删除，若恢复默认卡片需一并补回。 */
 .dashboard .collections {
   display: none;
 }
@@ -1214,8 +1199,7 @@ html[data-theme='dark'] .os-stats__alert {
 
 
 /* ---------- 空列表：保留表头 ---------- */
-.collection-list--items .no-results,
-.collection-list--submissions .no-results {
+.collection-list__wrap:has(.shelfry-empty-table) .no-results {
   display: none;
 }
 
@@ -1304,10 +1288,6 @@ html[data-theme='dark'] .os-stats__alert {
 }
 
 
-.shelfry-empty-table--submissions .shelfry-empty-table__head {
-  grid-template-columns: minmax(220px, 1.6fr) 1fr 1fr 1fr;
-}
-
 /* 滚动时把搜索 + 状态导航固定在顶部 */
 .collection-list__wrap > .list-controls {
   position: sticky;
@@ -1344,24 +1324,15 @@ html[data-theme='dark'] .os-stats__alert {
   margin-inline: 0;
 }
 
-.dashboard {
-  width: 100%;
-  max-width: none;
-  margin-inline: 0;
-}
-
 /* 编辑 / 新建 / 设置页统一页头，表单本身不额外改布局 */
 .doc-header {
   position: relative;
   overflow: hidden;
   margin: 10px 0 0;
-  padding: 24px 28px;
-  border-radius: 20px;
+  padding: 20px 26px !important;
+  border-radius: 18px !important;
   color: #fff;
-  background:
-    radial-gradient(520px 220px at 92% -20%, rgba(56, 189, 248, 0.5), transparent 65%),
-    radial-gradient(420px 220px at 5% 120%, rgba(99, 102, 241, 0.36), transparent 70%),
-    linear-gradient(135deg, #0b1220 0%, #102a4c 58%, #0a4f8f 100%);
+  background: var(--sr-hero-doc);
   box-shadow: 0 18px 40px -30px rgba(2, 20, 45, 0.9);
 }
 
@@ -1371,7 +1342,7 @@ html[data-theme='dark'] .os-stats__alert {
 
 .doc-header__title {
   color: #fff;
-  font-size: clamp(28px, 3vw, 38px);
+  font-size: clamp(26px, 2.6vw, 34px) !important;
   line-height: 1.1;
   letter-spacing: -0.035em;
 }
@@ -1391,15 +1362,19 @@ html[data-theme='dark'] .os-stats__alert {
 
 .doc-tabs .btn,
 .doc-tabs .doc-tab {
+  height: 32px;
+  padding: 0 14px;
   border: 0 !important;
   border-bottom: 0 !important;
   border-radius: 999px;
   color: rgba(255, 255, 255, 0.72);
+  font-size: 12.5px;
 }
 
 .doc-tabs .doc-tab--active {
-  background: #fff !important;
-  color: #0b1220 !important;
+  background: linear-gradient(135deg, #0071e3, #4f46e5) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 16px -10px rgba(2, 20, 45, 0.9);
 }
 
 @media (max-width: 768px) {
@@ -1408,3 +1383,333 @@ html[data-theme='dark'] .os-stats__alert {
     border-radius: 16px;
   }
 }
+
+/* 编辑 / 设置页：表单与页头左边对齐，输入区占满 */
+.document-fields__edit {
+  padding-left: 28px;
+  padding-right: 28px;
+}
+
+.tabs-field__content-wrap {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (max-width: 768px) {
+  .document-fields__edit {
+    padding-left: var(--gutter-h);
+    padding-right: var(--gutter-h);
+  }
+}
+
+/* 标签页与表单左边缘对齐 */
+.tabs-field__tabs-wrap,
+.tabs-field__tabs {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+.tabs-field__tab-button:first-child {
+  margin-left: 0 !important;
+}
+
+/* 编辑/设置页与列表页使用同一左右边距 */
+.doc-header,
+.doc-controls,
+.collection-edit__main-wrapper {
+  width: calc(100% - var(--gutter-h) * 2);
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.document-fields__edit {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (max-width: 768px) {
+  .doc-header,
+  .doc-controls,
+  .collection-edit__main-wrapper {
+    width: calc(100% - var(--gutter-h) * 2);
+  }
+}
+
+/* 设置页覆盖：与列表页相同的左右 gutter */
+body:has(.global-edit--settings) .doc-header,
+body:has(.global-edit--settings) .doc-controls,
+body:has(.global-edit--settings) .collection-edit__main-wrapper {
+  width: calc(100% - var(--gutter-h) * 2);
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body:has(.global-edit--settings) .document-fields__edit {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* 有侧栏的编辑页：取消表单向左的负边距，与页头对齐 */
+.document-fields--has-sidebar .document-fields__fields > .tabs-field,
+.document-fields--has-sidebar .document-fields__fields > .group-field {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* 只让状态栏吸顶，搜索区不再和顶栏重叠 */
+.collection-list__wrap > .list-controls {
+  position: static;
+  top: auto;
+}
+
+.collection-list__wrap > .shelfry-admin-list-tools {
+  position: sticky;
+  top: var(--app-header-height);
+  z-index: 24;
+}
+
+/* 条目编辑页：标签胶囊化 / 侧栏卡片化（不改变表单宽度） */
+.document-fields--has-sidebar .tabs-field__tabs-wrap {
+  margin-bottom: 14px;
+}
+
+.document-fields--has-sidebar .tabs-field__tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--theme-elevation-100);
+}
+
+.document-fields--has-sidebar .tabs-field__tab-button {
+  height: 32px;
+  padding: 0 14px;
+  border: 0 !important;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--theme-elevation-500);
+  font-size: 12.5px;
+}
+
+.document-fields--has-sidebar .tabs-field__tab-button--active {
+  background: linear-gradient(135deg, #0071e3, #4f46e5);
+  color: #fff;
+}
+
+.document-fields--has-sidebar .document-fields__sidebar-wrap {
+  padding: 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 16px;
+  background: var(--theme-elevation-0);
+}
+
+/* 所有表单标签页统一胶囊样式（设置页 + 条目编辑页） */
+.tabs-field__tabs {
+  display: inline-flex !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  border-radius: 999px !important;
+  background: var(--theme-elevation-100) !important;
+  border: 0 !important;
+}
+
+.tabs-field__tab-button {
+  height: 32px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--theme-elevation-500) !important;
+  font-size: 12.5px !important;
+}
+
+.tabs-field__tab-button--active {
+  background: linear-gradient(135deg, #0071e3, #4f46e5) !important;
+  color: #fff !important;
+}
+
+.tabs-field__tab-button::after,
+.tabs-field__tab-button::before {
+  display: none !important;
+}
+
+/* 标签容器左对齐，避免设置页胶囊标签居中偏移 */
+.tabs-field__tabs-wrap {
+  display: flex !important;
+  justify-content: flex-start !important;
+}
+
+.tabs-field__tabs {
+  justify-content: flex-start !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+/* 去掉 Payload 标签容器左右 60px 的伪元素占位 */
+.tabs-field__tabs::before,
+.tabs-field__tabs::after {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* ============================================================
+   统一卡片式后台：页头 → 操作栏 → 内容卡
+   ============================================================ */
+
+/* 编辑页操作栏做成卡片 */
+.doc-controls {
+  width: calc(100% - var(--gutter-h) * 2);
+  max-width: none;
+  margin: 12px auto 0;
+  padding: 10px 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 16px;
+  background: var(--theme-elevation-0);
+  box-shadow: 0 14px 30px -28px rgba(0, 0, 0, 0.55);
+}
+
+/* 编辑 / 设置页主体统一白卡 */
+.collection-edit .document-fields__main {
+  overflow: hidden;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 18px;
+  background: var(--theme-elevation-0);
+  box-shadow: 0 16px 34px -30px rgba(0, 0, 0, 0.45);
+}
+
+.collection-edit .document-fields__edit {
+  padding: 20px 22px;
+}
+
+.collection-edit .document-fields__main .tabs-field {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.collection-edit .tabs-field__content-wrap {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* 侧栏统一卡片 */
+.collection-edit .document-fields__sidebar-wrap {
+  padding: 16px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 18px;
+  background: var(--theme-elevation-0);
+  box-shadow: 0 16px 34px -30px rgba(0, 0, 0, 0.45);
+}
+
+/* 列表页表格卡片统一 */
+.collection-list .table {
+  border-radius: 18px;
+  background: var(--theme-elevation-0);
+  box-shadow: 0 16px 34px -30px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 768px) {
+  .list-header,
+  .doc-header {
+    padding: 18px !important;
+    border-radius: 16px !important;
+  }
+
+  .doc-controls {
+    width: calc(100% - var(--gutter-h) * 2);
+    padding: 8px 12px;
+  }
+
+  .collection-edit .document-fields__edit {
+    padding: 14px;
+  }
+}
+
+/* 统一模块纵向 / 横向间距 */
+:root {
+  --shelfry-module-gap: 12px;
+}
+
+.doc-controls {
+  margin-top: 8px;
+}
+
+.collection-edit__main-wrapper {
+  margin-top: var(--shelfry-module-gap);
+}
+
+.document-fields--has-sidebar .document-fields__sidebar-wrap {
+  width: calc(33.333% - 16px);
+  margin-left: 16px;
+}
+
+.document-fields__edit .field-type {
+  margin-bottom: 14px;
+}
+
+.document-fields__edit .field-type:last-child {
+  margin-bottom: 0;
+}
+
+.tabs-field__tabs-wrap {
+  margin-bottom: 14px !important;
+}
+
+/* 列表页模块间距统一 */
+.collection-list__wrap > .list-header {
+  margin-bottom: 12px;
+}
+
+.collection-list__wrap > .shelfry-admin-list-tools {
+  margin-bottom: 12px;
+}
+
+@media (max-width: 1024px) {
+  .document-fields--has-sidebar .document-fields__sidebar-wrap {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* 强制所有编辑/设置页在视口内留出左右 gutter，避免右侧被裁切 */
+.doc-header,
+.doc-controls,
+.collection-edit__main-wrapper {
+  width: auto !important;
+  max-width: none !important;
+  margin-left: var(--gutter-h) !important;
+  margin-right: var(--gutter-h) !important;
+}
+
+.collection-edit,
+.collection-edit__main-wrapper,
+.document-fields,
+.document-fields__main,
+.document-fields__edit,
+.tabs-field,
+.tabs-field__content-wrap,
+.tabs-field__tab {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.collection-edit,
+.collection-list {
+  overflow-x: clip;
+}
+
+
+/* 编辑 / 设置页页头补上和列表页一致的小标题 */
+.doc-header__title::before {
+  content: 'SHELFRY · 内容管理';
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(186, 222, 255, 0.82);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+}
+

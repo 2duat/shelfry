@@ -9,6 +9,9 @@ export const Tags: CollectionConfig = {
     useAsTitle: 'name',
     group: '内容',
     defaultColumns: ['name', 'slug', 'group'],
+    components: {
+      beforeListTable: ['/components/admin/EmptyListState#EmptyListState'],
+    },
   },
   access: {
     read: anyone,

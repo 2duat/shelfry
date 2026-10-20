@@ -8,6 +8,9 @@ export const SyncRuns: CollectionConfig = {
     useAsTitle: 'id',
     group: '运营',
     defaultColumns: ['type', 'status', 'trigger', 'startedAt', 'finishedAt'],
+    components: {
+      beforeListTable: ['/components/admin/EmptyListState#EmptyListState'],
+    },
     description: '定时任务与手动导入的执行记录',
   },
   access: {

@@ -9,6 +9,9 @@ export const CuratedLists: CollectionConfig = {
     useAsTitle: 'title',
     group: '内容',
     defaultColumns: ['title', 'status', 'sort', 'updatedAt'],
+    components: {
+      beforeListTable: ['/components/admin/EmptyListState#EmptyListState'],
+    },
     description: '编辑策展的清单，例如「新 Mac 必装 30 款」',
   },
   access: {

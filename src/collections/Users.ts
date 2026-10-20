@@ -16,6 +16,9 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
     group: '系统',
     defaultColumns: ['email', 'name', 'role'],
+    components: {
+      beforeListTable: ['/components/admin/EmptyListState#EmptyListState'],
+    },
   },
   access: {
     read: authenticated,
