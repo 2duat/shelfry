@@ -1780,7 +1780,7 @@ html[data-theme='dark'] .os-stats__alert {
 
 .global-edit--settings .doc-controls {
   position: absolute;
-  top: 22px;
+  top: 11px;
   /* 表单容器比卡片宽一个 gutter，right 要加上 gutter 才对得齐卡片右边缘 */
   right: calc(var(--gutter-h) + 18px);
   z-index: 4;
@@ -1822,12 +1822,42 @@ html[data-theme='dark'] .os-stats__alert {
   transform: none !important;
 }
 
-/* 站点设置：标签行做成卡片头部，与保存按钮同一条基线 */
+/* 表单卡片头部：标签行做成有底色的条带，形成 Hero → 条带 → 表单三层 */
 .global-edit--settings .tabs-field__tabs-wrap {
-  width: 100%;
-  padding: 0 0 16px;
-  margin-bottom: 20px;
+  width: auto !important;
+  padding: 12px 16px !important;
+  margin: -18px -22px 20px !important;
   border-bottom: 1px solid var(--theme-border-color);
+  border-radius: 18px 18px 0 0;
+  background: var(--theme-elevation-150);
+}
+
+.collection-edit .tabs-field__tabs-wrap {
+  width: auto !important;
+  padding: 12px 16px !important;
+  margin: -20px -22px 20px !important;
+  border-bottom: 1px solid var(--theme-border-color);
+  border-radius: 18px 18px 0 0;
+  background: var(--theme-elevation-150);
+}
+
+/* 条带内的标签本身透明，选中的用白底胶囊浮起来 */
+.global-edit--settings .tabs-field__tabs,
+.collection-edit .tabs-field__tabs {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.global-edit--settings .tabs-field__tab-button,
+.collection-edit .tabs-field__tab-button {
+  background: transparent !important;
+}
+
+.global-edit--settings .tabs-field__tab-button--active,
+.collection-edit .tabs-field__tab-button--active {
+  background: var(--theme-elevation-0) !important;
+  color: var(--theme-text) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 /* 站点设置：内容卡内边距，字段不再贴边 */
