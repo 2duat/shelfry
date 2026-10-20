@@ -571,6 +571,85 @@ html[data-theme='dark'] .os-import__msg--error {
   margin-bottom: 28px;
 }
 
+
+/* ---------- API 调试页：左参数 / 右响应 ---------- */
+.query-inspector {
+  display: grid !important;
+  grid-template-columns: 360px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  width: auto !important;
+  max-width: none;
+  margin: 12px var(--gutter-h) 0 !important;
+  padding: 0;
+}
+
+.query-inspector__configuration {
+  position: sticky;
+  top: calc(var(--app-header-height) + 12px);
+  width: auto !important;
+  padding: 20px;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 16px;
+  background: var(--theme-elevation-0);
+  box-shadow: 0 16px 34px -30px rgba(0, 0, 0, 0.45);
+}
+
+.query-inspector__api-url {
+  font-size: 12px;
+  color: var(--theme-elevation-450);
+}
+
+.query-inspector__api-url a {
+  color: var(--os-accent);
+  word-break: break-all;
+}
+
+.query-inspector__form-fields {
+  gap: 14px;
+}
+
+.query-inspector__results-wrapper {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 16px;
+  background: var(--theme-elevation-0);
+  box-shadow: 0 16px 34px -30px rgba(0, 0, 0, 0.45);
+}
+
+.query-inspector__results {
+  min-height: 420px;
+  max-height: calc(100vh - var(--app-header-height) - 220px);
+  overflow: auto;
+  padding: 18px;
+  background: var(--theme-elevation-50);
+}
+
+.query-inspector__results pre,
+.query-inspector__results code {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.query-inspector__toggle-fullscreen-button-container {
+  top: 10px;
+  right: 10px;
+}
+
+@media (max-width: 1024px) {
+  .query-inspector {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .query-inspector__configuration {
+    position: static;
+  }
+}
+
 /* ---------- 统一 Hero：仪表盘与所有列表页共用 ---------- */
 .shelfry-hero {
   margin-bottom: 12px;
@@ -1496,6 +1575,9 @@ html[data-theme='dark'] .os-stats__alert {
   display: inline-flex !important;
   /* Payload 默认 min-width:100%，会把胶囊条拉满整行 */
   min-width: 0 !important;
+  width: fit-content !important;
+  max-width: 100%;
+  align-items: center;
   gap: 4px !important;
   padding: 4px !important;
   border-radius: 999px !important;
@@ -1505,7 +1587,9 @@ html[data-theme='dark'] .os-stats__alert {
 
 .tabs-field__tab-button {
   height: 32px !important;
+  margin: 0 !important;
   padding: 0 14px !important;
+  flex: 0 0 auto;
   border: 0 !important;
   border-radius: 999px !important;
   background: transparent !important;
@@ -1689,19 +1773,44 @@ html[data-theme='dark'] .os-stats__alert {
 }
 
 
-/* 站点设置：只保留右侧保存按钮，不再是一条空面板 */
+/* 站点设置：保存按钮落在表单卡右上角，和标签条同一行 */
+.global-edit--settings .collection-edit__form {
+  position: relative;
+}
+
 .global-edit--settings .doc-controls {
-  width: fit-content !important;
-  margin: 8px var(--gutter-h) 0 auto !important;
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  z-index: 4;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
   padding: 0 !important;
+  min-height: 0;
   background: transparent;
   border: 0;
   box-shadow: none;
 }
 
+@media (max-width: 768px) {
+  .global-edit--settings .doc-controls {
+    position: static;
+    margin: 8px var(--gutter-h) 0 auto !important;
+  }
+}
+
 .global-edit--settings .doc-controls__meta,
 .global-edit--settings .doc-controls__divider {
   display: none !important;
+}
+
+/* 站点设置：标签行做成卡片头部，与保存按钮同一条基线 */
+.global-edit--settings .tabs-field__tabs-wrap {
+  width: 100%;
+  padding: 0 0 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--theme-border-color);
 }
 
 /* 站点设置：内容卡内边距，字段不再贴边 */
