@@ -1841,23 +1841,36 @@ html[data-theme='dark'] .os-stats__alert {
   background: var(--theme-elevation-150);
 }
 
-/* 条带内的标签本身透明，选中的用白底胶囊浮起来 */
+/* 条带内的标签不用底色，靠文字颜色区分选中态 */
 .global-edit--settings .tabs-field__tabs,
 .collection-edit .tabs-field__tabs {
   background: transparent !important;
   padding: 0 !important;
+  gap: 22px !important;
 }
 
 .global-edit--settings .tabs-field__tab-button,
 .collection-edit .tabs-field__tab-button {
+  height: 28px !important;
+  padding: 0 !important;
   background: transparent !important;
+  box-shadow: none !important;
+  color: var(--theme-elevation-450) !important;
+  font-weight: 500 !important;
+  transition: color 0.15s ease;
+}
+
+.global-edit--settings .tabs-field__tab-button:hover,
+.collection-edit .tabs-field__tab-button:hover {
+  color: var(--theme-elevation-800) !important;
 }
 
 .global-edit--settings .tabs-field__tab-button--active,
 .collection-edit .tabs-field__tab-button--active {
-  background: var(--theme-elevation-0) !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: var(--theme-text) !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  font-weight: 650 !important;
 }
 
 /* 站点设置：内容卡内边距，字段不再贴边 */
