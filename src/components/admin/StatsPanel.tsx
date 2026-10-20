@@ -17,6 +17,7 @@ import {
   Tag,
   Users,
 } from 'lucide-react'
+import Link from 'next/link'
 import React, { useCallback, useEffect, useState } from 'react'
 
 type Stats = {
@@ -69,7 +70,9 @@ const TASK_LABELS: Record<string, string> = {
 }
 
 function timeAgo(value: string): string {
-  const diff = Date.now() - new Date(value).getTime()
+  const time = new Date(value).getTime()
+  if (!Number.isFinite(time)) return '时间未知'
+  const diff = Date.now() - time
   const minutes = Math.floor(diff / 60000)
   if (minutes < 1) return '刚刚'
   if (minutes < 60) return `${minutes} 分钟前`
@@ -102,27 +105,52 @@ export function StatsPanel() {
   }, [])
 
   useEffect(() => {
-    load()
+    void load()
   }, [load])
+
+  const heroActions = (
+    <div className="shelfry-hero__actions">
+      <button type="button" className="shelfry-hero__button" onClick={() => void load()} disabled={loading}>
+        <RefreshCw size={13} className={loading ? 'os-spin' : ''} />
+        刷新数据
+      </button>
+      <Link className="shelfry-hero__cta" href="/admin/collections/items/create">
+        ＋ 新建条目
+      </Link>
+    </div>
+  )
+
+  // 仪表盘与所有列表页共用同一套 Hero，避免它是唯一没有页头的后台页面
+  const renderHero = (description: React.ReactNode) => (
+    <section className="list-header shelfry-hero">
+      <div className="list-header__content">
+        <div className="shelfry-hero__row">
+          <div className="shelfry-hero__text">
+            <span className="shelfry-hero__eyebrow">SHELFRY · 内容管理</span>
+            <h1 className="shelfry-hero__title">数据概览</h1>
+            <p className="shelfry-hero__desc">{description}</p>
+          </div>
+          {heroActions}
+        </div>
+      </div>
+    </section>
+  )
 
   if (error) {
     return (
-      <div className="os-stats os-stats--error">
-        数据加载失败：{error}
-        <button type="button" onClick={load}>
-          重试
-        </button>
+      <div className="os-stats">
+        {renderHero('内容、投稿与同步任务总览')}
+        <div className="os-stats__error" role="alert">
+          数据加载失败：{error}
+        </div>
       </div>
     )
   }
 
   if (!data) {
     return (
-      <div className="os-stats">
-        <div className="os-stats__head">
-          <div className="os-stats__title">数据概览</div>
-          <span className="os-stats__muted">{loading ? '加载中…' : ''}</span>
-        </div>
+      <div className="os-stats" role="status" aria-live="polite">
+        {renderHero('内容、投稿与同步任务总览')}
       </div>
     )
   }
@@ -208,29 +236,22 @@ export function StatsPanel() {
 
   return (
     <div className="os-stats">
-      <div className="os-stats__head">
-        <div>
-          <div className="os-stats__title">数据概览</div>
-          <div className="os-stats__sub">
-            {lastSync ? (
-              <>
-                最近同步：{TASK_LABELS[lastSync.type] || lastSync.type} ·{' '}
-                {lastSync.status === 'success' ? '成功' : lastSync.status === 'failed' ? '失败' : '运行中'} ·{' '}
-                {timeAgo(lastSync.finishedAt)}
-              </>
-            ) : (
-              '还没有同步记录'
-            )}
-            {totals.failedSync > 0 ? (
-              <span className="os-stats__alert"> · 失败 {totals.failedSync} 次</span>
-            ) : null}
-          </div>
-        </div>
-        <button type="button" className="os-stats__refresh" onClick={load} disabled={loading}>
-          <RefreshCw size={13} className={loading ? 'os-spin' : ''} />
-          刷新
-        </button>
-      </div>
+      {renderHero(
+        <>
+          {lastSync ? (
+            <>
+              最近同步：{TASK_LABELS[lastSync.type] || lastSync.type} ·{' '}
+              {lastSync.status === 'success' ? '成功' : lastSync.status === 'failed' ? '失败' : '运行中'} ·{' '}
+              {timeAgo(lastSync.finishedAt)}
+            </>
+          ) : (
+            '还没有同步记录'
+          )}
+          {totals.failedSync > 0 ? (
+            <span className="os-stats__alert"> · 失败 {totals.failedSync} 次</span>
+          ) : null}
+        </>,
+      )}
 
       <div className="os-stats__grid">
         {cards.map((card) => {
@@ -307,14 +328,14 @@ export function StatsPanel() {
       <div className="os-quick">
         <div className="os-quick__head">
           <div className="os-panel__title">快捷入口</div>
-          <span className="os-stats__muted">共 9 个模块</span>
+          <span className="os-stats__muted">共 {quickLinks.length} 个模块</span>
         </div>
         <div className="os-quick__grid">
           {quickLinks.map((item) => {
             const Icon = item.icon
             return (
               <div className="os-quick__tile" key={item.name}>
-                <a className="os-quick__main" href={item.href}>
+                <Link className="os-quick__main" href={item.href}>
                   <span className="os-quick__icon">
                     <Icon size={15} />
                   </span>
@@ -324,11 +345,11 @@ export function StatsPanel() {
                       {item.count === null ? '配置' : `${formatNumber(item.count)} 条`}
                     </span>
                   </span>
-                </a>
+                </Link>
                 {item.create ? (
-                  <a className="os-quick__add" href={item.create} aria-label={`新建${item.name}`}>
+                  <Link className="os-quick__add" href={item.create} aria-label={`新建${item.name}`}>
                     +
-                  </a>
+                  </Link>
                 ) : null}
               </div>
             )

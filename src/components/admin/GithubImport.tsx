@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
@@ -75,9 +76,9 @@ export function GithubImport() {
             粘贴仓库地址，自动抓取星标、协议、README，并生成中文介绍
           </div>
         </div>
-        <a className="os-import__link" href="/admin/collections/items/create">
+        <Link className="os-import__link" href="/admin/collections/items/create">
           手动填写 →
-        </a>
+        </Link>
       </div>
 
       <form className="os-import__row" onSubmit={submit}>
@@ -105,21 +106,25 @@ export function GithubImport() {
         </button>
       </form>
 
-      {error ? <div className="os-import__msg os-import__msg--error">{error}</div> : null}
+      {error ? (
+        <div className="os-import__msg os-import__msg--error" role="alert">
+          {error}
+        </div>
+      ) : null}
 
       {existing ? (
-        <div className="os-import__msg os-import__msg--warn">
+        <div className="os-import__msg os-import__msg--warn" role="status">
           这个仓库已经在库里了：<strong>{existing.name}</strong>
-          <a href={`/admin/collections/items/${existing.id}`}>打开条目 →</a>
+          <Link href={`/admin/collections/items/${existing.id}`}>打开条目 →</Link>
         </div>
       ) : null}
 
       {result ? (
-        <div className="os-import__msg os-import__msg--ok">
+        <div className="os-import__msg os-import__msg--ok" role="status">
           已导入 <strong>{result.name}</strong>
           {typeof result.stars === 'number' ? ` · ★ ${result.stars.toLocaleString()}` : ''}
           {result.status === 'published' ? ' · 已发布' : ' · 草稿'}
-          <a href={`/admin/collections/items/${result.id}`}>打开编辑 →</a>
+          <Link href={`/admin/collections/items/${result.id}`}>打开编辑 →</Link>
           <button type="button" onClick={() => router.refresh()}>
             刷新列表
           </button>

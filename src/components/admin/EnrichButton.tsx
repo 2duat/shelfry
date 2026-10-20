@@ -41,7 +41,11 @@ export function EnrichButton() {
         {busy ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
         {busy ? '正在补全…' : '立即 AI 补全'}
       </button>
-      {message ? <span className="shelfry-admin-message">{message}</span> : null}
+      {message ? (
+        <span className="shelfry-admin-message" role="status">
+          {message}
+        </span>
+      ) : null}
     </div>
   )
 }

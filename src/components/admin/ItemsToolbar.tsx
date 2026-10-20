@@ -176,7 +176,10 @@ export function ItemsToolbar() {
     }
   }
 
-  const showEnrichAll = active === 'ai-pending' && (counts?.items.aiPending || 0) > 0
+  const aiPending = counts?.items.aiPending || 0
+  // 后端单次最多入队 200，文案不能声称「全部」
+  const enrichAllCount = Math.min(aiPending, 200)
+  const showEnrichAll = active === 'ai-pending' && aiPending > 0
 
   return (
     <div className="shelfry-admin-list-tools">
@@ -220,7 +223,8 @@ export function ItemsToolbar() {
             disabled={busy}
             onClick={() => void applyEnrich(true)}
           >
-            一键补全全部 {counts?.items.aiPending}
+            一键补全全部 {enrichAllCount}
+            {aiPending > 200 ? `（共 ${aiPending}，单次上限 200）` : ''}
           </button>
         ) : null}
 
@@ -247,7 +251,9 @@ export function ItemsToolbar() {
             加载中
           </span>
         ) : message ? (
-          <span className="shelfry-admin-message">{message}</span>
+          <span className="shelfry-admin-message" role="status">
+            {message}
+          </span>
         ) : null}
       </div>
     </div>

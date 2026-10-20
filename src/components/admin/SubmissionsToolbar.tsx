@@ -31,6 +31,11 @@ export function SubmissionsToolbar() {
     setActive(currentStatus)
   }, [currentStatus])
 
+  // 路由变化后清掉「正在跳转」的高亮，避免导航失败时残留
+  useEffect(() => {
+    setPendingItem(null)
+  }, [pathname])
+
   const loadCounts = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/item-counts', { cache: 'no-store' })
@@ -45,6 +50,16 @@ export function SubmissionsToolbar() {
   }, [loadCounts])
 
   const itemsBase = pathname.replace(/\/submissions\/?$/, '/items')
+
+  // 与其他 tab 保持一致：切换状态时保留搜索词、每页条数等参数，只重置页码
+  const buildStatusHref = (status?: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('page')
+    params.delete('where[status][equals]')
+    if (status) params.set('where[status][equals]', status)
+    const query = params.toString()
+    return query ? `${pathname}?${query}` : pathname
+  }
   const itemsTabs = [
     { key: 'items-all', label: '全部', href: itemsBase, count: counts?.items.all },
     {
@@ -69,23 +84,23 @@ export function SubmissionsToolbar() {
   ]
 
   const statusTabs = [
-    { key: 'all', label: '全部投稿', href: pathname, count: counts?.submissions.all },
+    { key: 'all', label: '全部投稿', href: buildStatusHref(), count: counts?.submissions.all },
     {
       key: 'pending',
       label: '待审核',
-      href: `${pathname}${statusQuery('pending')}`,
+      href: buildStatusHref('pending'),
       count: counts?.submissions.pending,
     },
     {
       key: 'approved',
       label: '已通过',
-      href: `${pathname}${statusQuery('approved')}`,
+      href: buildStatusHref('approved'),
       count: counts?.submissions.approved,
     },
     {
       key: 'rejected',
       label: '已拒绝',
-      href: `${pathname}${statusQuery('rejected')}`,
+      href: buildStatusHref('rejected'),
       count: counts?.submissions.rejected,
     },
   ]
@@ -206,7 +221,9 @@ export function SubmissionsToolbar() {
             加载中
           </span>
         ) : message ? (
-          <span className="shelfry-admin-message">{message}</span>
+          <span className="shelfry-admin-message" role="status">
+            {message}
+          </span>
         ) : null}
       </div>
     </div>
