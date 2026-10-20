@@ -1,6 +1,6 @@
 'use client'
 
-import { useSelection } from '@payloadcms/ui'
+import { useConfig, useSelection } from '@payloadcms/ui'
 import { Loader2, Sparkles } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
@@ -18,6 +18,7 @@ type Counts = {
 }
 
 export function ItemsToolbar() {
+  const { config } = useConfig()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -35,6 +36,32 @@ export function ItemsToolbar() {
   useEffect(() => {
     setActive(activeKey)
   }, [activeKey])
+
+  // Payload 会把列配置写进 URL 和偏好设置，历史数据可能把「名称」列关掉；
+  // 名称列是进入编辑页的唯一入口，缺了它列表不可用。这里读取已渲染的列头，
+  // 如果标题列不在其中，就把它补回去并写回 URL（Payload 会同步进偏好设置）。
+  useEffect(() => {
+    const collection = config?.collections?.find((item) => item.slug === 'items')
+    const titleField = collection?.admin?.useAsTitle || 'name'
+
+    const timer = window.setTimeout(() => {
+      const headings = [...document.querySelectorAll('th[id^="heading-"]')]
+        .map((th) => th.id.replace('heading-', ''))
+        .filter((id) => id && id !== '_select')
+      // 表格还没渲染出来时不要误判，等下一次交互再修
+      if (!headings.length || headings.includes(titleField)) return
+
+      const params = new URLSearchParams(searchParams.toString())
+      const columns = [titleField, ...headings.filter((id) => id !== titleField)].map((accessor) => ({
+        accessor,
+        active: true,
+      }))
+      params.set('columns', JSON.stringify(columns))
+      router.replace(`${pathname}?${params.toString()}`)
+    }, 500)
+
+    return () => window.clearTimeout(timer)
+  }, [searchParams, config, pathname, router])
 
   const loadCounts = useCallback(async () => {
     try {
@@ -54,6 +81,8 @@ export function ItemsToolbar() {
     params.delete('page')
     params.delete('where[status][equals]')
     params.delete('where[aiEnriched][equals]')
+    params.delete('columns')
+    params.delete('queryByGroup')
     if (options.status) params.set('where[status][equals]', options.status)
     if (options.ai) params.set('where[aiEnriched][equals]', options.ai)
     const query = params.toString()
@@ -64,6 +93,8 @@ export function ItemsToolbar() {
     const params = new URLSearchParams(searchParams.toString())
     params.delete('page')
     params.delete('where[status][equals]')
+    params.delete('columns')
+    params.delete('queryByGroup')
     if (options.ai) params.set('where[aiEnriched][equals]', options.ai)
     else params.delete('where[aiEnriched][equals]')
     const query = params.toString()
