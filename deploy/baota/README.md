@@ -52,7 +52,8 @@
 
 ```bash
 cd /www/wwwroot
-git clone <你的仓库地址> shelfry
+git clone https://github.com/shelfry/shelfry.git shelfry
+# 如果仓库以后转成私有，用 SSH：git clone git@github.com:shelfry/shelfry.git shelfry
 cd shelfry
 ```
 
