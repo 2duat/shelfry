@@ -117,7 +117,11 @@ export async function POST(request: NextRequest) {
         aiMeta: {
           generated: enrichment.aiGenerated,
           model: enrichment.aiGenerated ? integration.model || null : null,
-          enrichedAt: new Date().toISOString(),
+          lastAttemptAt: new Date().toISOString(),
+          // 导入时 AI 失败不再标记为已补全，交给 enrich 定时任务重试
+          ...(enrichment.aiGenerated
+            ? { enrichedAt: new Date().toISOString() }
+            : { lastError: 'AI 未返回有效 JSON，稍后重试' }),
           categoryHint: enrichment.categoryHint,
           audience: enrichment.audience,
         },

@@ -142,10 +142,19 @@ export const Items: CollectionConfig = {
             Array.isArray(current.features) && current.features.length
               ? current.features
               : enrich.features.map((text) => ({ text }))
+          const previousAiMeta = (originalDoc as any)?.aiMeta
           data.aiMeta = {
             generated: enrich.aiGenerated,
             model: enrich.aiGenerated ? integration.model || null : null,
-            enrichedAt: new Date().toISOString(),
+            lastAttemptAt: new Date().toISOString(),
+            // 只有 AI 真正产出内容才写 enrichedAt；失败时保留历史完成时间（若曾补全过），
+            // 否则留空，让 enrich 定时任务在 24 小时后重试
+            ...(enrich.aiGenerated
+              ? { enrichedAt: new Date().toISOString() }
+              : {
+                  ...(previousAiMeta?.enrichedAt ? { enrichedAt: previousAiMeta.enrichedAt } : {}),
+                  lastError: 'AI 未返回有效 JSON，稍后重试',
+                }),
             categoryHint: enrich.categoryHint,
             audience: enrich.audience,
             readmeLength: info.readme.length,
@@ -192,7 +201,9 @@ export const Items: CollectionConfig = {
         }
 
         const aiMeta = (data as any).aiMeta ?? (originalDoc as any)?.aiMeta
-        ;(data as any).aiEnriched = Boolean(aiMeta?.enrichedAt)
+        // 兼容历史脏数据：有 enrichedAt 但 AI 明确失败过的条目，不能算已补全
+        ;(data as any).aiEnriched =
+          Boolean(aiMeta?.enrichedAt) && aiMeta?.generated !== false
 
         return data
       },

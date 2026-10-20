@@ -183,7 +183,11 @@ async function runEnrich(
           aiMeta: {
             generated: enrichment.aiGenerated,
             model: integration.model || null,
-            enrichedAt: new Date().toISOString(),
+            lastAttemptAt: new Date().toISOString(),
+            // 只有 AI 真正产出内容才算补全完成；失败只记录 lastError，留给下一轮重试
+            ...(enrichment.aiGenerated
+              ? { enrichedAt: new Date().toISOString() }
+              : { lastError: 'AI 未返回有效 JSON，稍后重试' }),
             categoryHint: enrichment.categoryHint,
           },
         },
