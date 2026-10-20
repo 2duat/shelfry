@@ -212,7 +212,7 @@ body {
   top: 0;
   z-index: 30;
   border-bottom: 1px solid var(--theme-border-color);
-  background: color-mix(in srgb, var(--theme-bg) 82%, transparent);
+  background: color-mix(in srgb, var(--theme-bg) 94%, transparent);
   backdrop-filter: saturate(180%) blur(16px);
   -webkit-backdrop-filter: saturate(180%) blur(16px);
 }
@@ -1437,21 +1437,6 @@ html[data-theme='dark'] .os-stats__alert {
   }
 }
 
-/* 设置页覆盖：与列表页相同的左右 gutter */
-body:has(.global-edit--settings) .doc-header,
-body:has(.global-edit--settings) .doc-controls,
-body:has(.global-edit--settings) .collection-edit__main-wrapper {
-  width: calc(100% - var(--gutter-h) * 2);
-  max-width: none;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-body:has(.global-edit--settings) .document-fields__edit {
-  padding-left: 0;
-  padding-right: 0;
-}
-
 /* 有侧栏的编辑页：取消表单向左的负边距，与页头对齐 */
 .document-fields--has-sidebar .document-fields__fields > .tabs-field,
 .document-fields--has-sidebar .document-fields__fields > .group-field {
@@ -1509,6 +1494,8 @@ body:has(.global-edit--settings) .document-fields__edit {
 /* 所有表单标签页统一胶囊样式（设置页 + 条目编辑页） */
 .tabs-field__tabs {
   display: inline-flex !important;
+  /* Payload 默认 min-width:100%，会把胶囊条拉满整行 */
+  min-width: 0 !important;
   gap: 4px !important;
   padding: 4px !important;
   border-radius: 999px !important;
@@ -1701,6 +1688,26 @@ body:has(.global-edit--settings) .document-fields__edit {
   overflow-x: clip;
 }
 
+
+/* 站点设置：只保留右侧保存按钮，不再是一条空面板 */
+.global-edit--settings .doc-controls {
+  width: fit-content !important;
+  margin: 8px var(--gutter-h) 0 auto !important;
+  padding: 0 !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.global-edit--settings .doc-controls__meta,
+.global-edit--settings .doc-controls__divider {
+  display: none !important;
+}
+
+/* 站点设置：内容卡内边距，字段不再贴边 */
+.global-edit--settings .document-fields__edit {
+  padding: 18px 22px 26px;
+}
 
 /* 编辑 / 设置页页头补上和列表页一致的小标题 */
 .doc-header__title::before {
